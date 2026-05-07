@@ -24,10 +24,10 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased">
+    <div className="min-h-screen bg-luxe-black font-sans text-red-50 antialiased">
       <Header />
       {eventId ? <EventDetailPage eventId={eventId} /> : <HomePage />}
-      <footer className="border-t border-slate-200 bg-white py-8 text-center text-sm font-semibold text-slate-500">
+      <footer className="border-t border-white/10 bg-luxe-black/95 py-8 text-center text-sm font-semibold text-red-100/45">
         PulsePass © 2026 · Todos los derechos reservados
       </footer>
     </div>
