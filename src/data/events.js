@@ -14,7 +14,7 @@ export const events = [
     category: 'Música',
     date: '2026-05-16T20:30:00',
     location: 'Distrito Creativo, Miami',
-    price: '60.000',
+    price: '60000',
     image: 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=1200&q=80',
     description:
       'Una noche inmersiva con artistas electrónicos emergentes, visuales reactivos y zonas lounge para conectar antes y después del show.',
