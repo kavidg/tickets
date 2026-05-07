@@ -28,7 +28,7 @@ export default function App() {
       <Header />
       {eventId ? <EventDetailPage eventId={eventId} /> : <HomePage />}
       <footer className="border-t border-slate-200 bg-white py-8 text-center text-sm font-semibold text-slate-500">
-        PulsePass © 2026 · Tiquetera SaaS para eventos con UX de alta conversión
+        PulsePass © 2026 · Todos los derechos reservados
       </footer>
     </div>
   );

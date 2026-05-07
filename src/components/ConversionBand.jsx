@@ -3,7 +3,7 @@ import { BadgeCheck, Clock3, LockKeyhole } from 'lucide-react';
 const benefits = [
   { icon: LockKeyhole, title: 'Checkout seguro', text: 'Compra en pocos pasos con confirmación inmediata.' },
   { icon: Clock3, title: 'Sin fricción', text: 'Entradas digitales listas para mostrar desde el móvil.' },
-  { icon: BadgeCheck, title: 'Eventos verificados', text: 'Organizadores curados y experiencias con cupos reales.' },
+  { icon: BadgeCheck, title: 'Eventos verificados', text: 'Organizadores garantizados y experiencias unicas.' },
 ];
 
 export default function ConversionBand() {

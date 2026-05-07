@@ -15,7 +15,7 @@ export default function Hero() {
             Encuentra el próximo evento que sí vas a recordar.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-            Una tiquetera moderna para descubrir conciertos, workshops y experiencias premium con compra rápida, entradas claras y recomendaciones curadas.
+            Una tiquetera moderna para descubrir conciertos y experiencias premium con compra rápida, entradas claras y beneficios.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button href="#events" variant="glow" className="gap-2">
@@ -26,7 +26,7 @@ export default function Hero() {
           <div className="mt-8 grid gap-3 text-sm font-semibold text-slate-600 sm:grid-cols-3">
             <span className="flex items-center gap-2"><Ticket className="h-4 w-4 text-cyan-700" /> Tickets instantáneos</span>
             <span className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-cyan-700" /> Pago seguro</span>
-            <span className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-cyan-700" /> Curaduría local</span>
+            <span className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-cyan-700" /> Beneficios unicos</span>
           </div>
         </div>
         <div className="relative z-10">
@@ -40,10 +40,10 @@ export default function Hero() {
               <p className="text-xs font-bold uppercase tracking-[0.22em] text-cyan-300">Evento destacado</p>
               <div className="mt-2 flex items-end justify-between gap-4">
                 <div>
-                  <h2 className="text-2xl font-black">Neon Sessions Live</h2>
-                  <p className="mt-1 text-sm text-slate-300">Sábado 16 mayo · Miami</p>
+                  <h2 className="text-2xl font-black">Hugel Sessions Live</h2>
+                  <p className="mt-1 text-sm text-slate-300">Sábado 16 mayo · Cali</p>
                 </div>
-                <span className="rounded-2xl bg-cyan-300 px-4 py-2 text-sm font-black text-slate-950">Desde $38</span>
+                <span className="rounded-2xl bg-cyan-300 px-4 py-2 text-sm font-black text-slate-950">Desde $60.000</span>
               </div>
             </div>
           </div>

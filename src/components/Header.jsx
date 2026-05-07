@@ -10,7 +10,7 @@ export default function Header() {
           </span>
           <div>
             <p className="text-base font-black tracking-tight text-slate-950">PulsePass</p>
-            <p className="hidden text-xs font-semibold uppercase tracking-[0.28em] text-slate-400 sm:block">Eventos curados</p>
+            <p className="hidden text-xs font-semibold uppercase tracking-[0.28em] text-slate-400 sm:block">Los mejores eventos a tu mano</p>
           </div>
         </a>
         <div className="hidden items-center gap-8 text-sm font-semibold text-slate-600 md:flex">
