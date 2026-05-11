@@ -22,7 +22,7 @@ export default function EventDetailPage({ eventId }) {
       <div className="pointer-events-none absolute left-0 top-0 h-96 w-96 rounded-full bg-luxe-wine/25 blur-3xl" />
       <div className="pointer-events-none absolute right-0 top-40 h-96 w-96 rounded-full bg-luxe-ember/10 blur-3xl" />
       <section className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <a href="#/" className="inline-flex items-center gap-2 text-sm font-black text-red-100/60 transition hover:text-luxe-ember">
+        <a href="#events" className="inline-flex items-center gap-2 text-sm font-black text-red-100/60 transition hover:text-luxe-ember">
           <ArrowLeft className="h-4 w-4" /> Volver a eventos
         </a>
         <div className="mt-6 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">

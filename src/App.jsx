@@ -8,14 +8,27 @@ function getEventIdFromHash() {
   return match ? decodeURIComponent(match[1]) : '';
 }
 
+function scrollToEventsSection() {
+  requestAnimationFrame(() => {
+    document.getElementById('events')?.scrollIntoView({ behavior: 'smooth' });
+  });
+}
+
 export default function App() {
   const [eventId, setEventId] = useState(getEventIdFromHash());
 
   useEffect(() => {
     const onHashChange = () => {
+      const hash = window.location.hash;
+
       setEventId(getEventIdFromHash());
-      if (window.location.hash.startsWith('#/event') || window.location.hash === '#/') {
+
+      if (hash.startsWith('#/event') || hash === '#/') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      if (hash === '#events') {
+        scrollToEventsSection();
       }
     };
 
