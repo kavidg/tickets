@@ -33,11 +33,11 @@ export const events = [
     price: 40000,
     image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80',
     description:
-      'Charlas accionables, mentorías express y networking curado para equipos que quieren escalar productos digitales con foco en crecimiento sostenible.',
+      'Charlas accionables, mentorías express y networking social para equipos que quieren escalar productos digitales con foco en crecimiento sostenible.',
     tickets: [
-      { name: 'Startup', price: 95, perks: 'Acceso a talks y coffee breaks' },
-      { name: 'Pro', price: 165, perks: 'Incluye workshops y bolsa de contactos' },
-      { name: 'Investor Lounge', price: 260, perks: 'Acceso a sala privada y sesiones 1:1' },
+      { name: 'Startup', price: 40000, perks: 'Acceso a talks y coffee breaks' },
+      { name: 'Pro', price: 90000, perks: 'Incluye workshops y network de contactos' },
+      { name: 'Investor', price: 150000, perks: 'Acceso a sala privada y sesiones 1:1' },
     ],
   },
   {
@@ -46,30 +46,30 @@ export const events = [
     category: 'Gastronomía',
     date: '2026-06-06T08:00:00',
     location: 'Granada Rooftop, Cali',
-    price: 50000,
+    price: 20000,
     image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1200&q=80',
     description:
-      'Festival al aire libre con chefs locales, cocina de temporada, música acústica y experiencias de maridaje diseñadas para descubrir nuevos sabores.',
+      'Experiencia exclusiva con chefs locales, cocina de temporada, música acústica y experiencias de maridaje diseñadas para descubrir nuevos sabores.',
     tickets: [
-      { name: 'Entrada feria', price: 24, perks: 'Acceso al mercado y música en vivo' },
-      { name: 'Degustación', price: 52, perks: 'Incluye 6 tastings y copa reutilizable' },
-      { name: 'Chef Table', price: 110, perks: 'Menú guiado de 5 tiempos' },
+      { name: 'Ingreso experiencia', price: 20000, perks: 'Acceso al lugar y música en vivo' },
+      { name: 'Degustación', price: 50000, perks: 'Incluye 6 tastings y copa reutilizable' },
+      { name: 'Chef Table', price: 100000, perks: 'Menú guiado de 5 tiempos' },
     ],
   },
   {
     id: 'after-dark-gallery',
     title: 'Art Gallery',
     category: 'Arte',
-    date: '2026-06-13T19:00:00',
+    date: '2026-06-11T19:00:00',
     location: 'Callao, Cali',
     price: 30000,
     image: 'https://images.unsplash.com/photo-1545987796-200677ee1011?auto=format&fit=crop&w=1200&q=80',
     description:
-      'Recorrido nocturno por instalaciones contemporáneas con performances, curadores invitados y espacios fotográficos de estética cinematográfica.',
+      'Recorrido nocturno por arte contemporáne0 con performances, artistas invitados y espacios fotográficos de estética cinematográfica.',
     tickets: [
-      { name: 'Walk', price: 31, perks: 'Recorrido libre por galerías participantes' },
-      { name: 'Guided', price: 49, perks: 'Tour con curador invitado' },
-      { name: 'Collector', price: 88, perks: 'Preview privado y catálogo impreso' },
+      { name: 'Walk', price: 30000, perks: 'Recorrido libre por galerías participantes' },
+      { name: 'Guided', price: 50000, perks: 'Tour con especialista invitado' },
+      { name: 'Collector', price: 100000, perks: 'Preview privado y catálogo impreso' },
     ],
   },
   {
@@ -81,11 +81,11 @@ export const events = [
     price: 30000,
     image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1200&q=80',
     description:
-      'Sesión frente al mar con yoga, respiración guiada, brunch nutritivo y micro charlas sobre hábitos de energía para líderes ocupados.',
+      'Sesión en lugar conmemorativo de la ciudad con yoga, respiración guiada, brunch nutritivo y micro charlas sobre hábitos de energía para liberar vibras.',
     tickets: [
-      { name: 'Mat spot', price: 42, perks: 'Clase, té frío y acceso al deck' },
-      { name: 'Brunch', price: 68, perks: 'Incluye brunch funcional' },
-      { name: 'Reset Pack', price: 98, perks: 'Brunch, journal y kit de aromaterapia' },
+      { name: 'Mat spot', price: 30000, perks: 'Clase, té frío y acceso al espacio' },
+      { name: 'Brunch', price: 50000, perks: 'Incluye brunch funcional' },
+      { name: 'Reset Pack', price: 90000, perks: 'Brunch, guia impresa y kit de aromaterapia' },
     ],
   },
   {
@@ -99,9 +99,9 @@ export const events = [
     description:
       'Laboratorio práctico para construir prototipos con IA, recibir feedback de mentores y cerrar la mañana con demos rápidas de la comunidad.',
     tickets: [
-      { name: 'Lab seat', price: 18, perks: 'Mesa de trabajo y café ilimitado' },
-      { name: 'Mentor', price: 45, perks: 'Revisión 1:1 de producto' },
-      { name: 'Team table', price: 120, perks: 'Mesa para 4 personas y demo slot' },
+      { name: 'Lab seat', price: 20000, perks: 'Mesa de trabajo y café ilimitado' },
+      { name: 'Mentor', price: 45000, perks: 'Revisión 1:1 de producto' },
+      { name: 'Team table', price: 90000, perks: 'Mesa para 4 personas y demo desarrollado' },
     ],
   },
 ];

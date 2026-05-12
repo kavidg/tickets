@@ -16,7 +16,7 @@ export default function Hero() {
             Encuentra el próximo evento que sí vas a recordar.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-red-100/68">
-            Una tiquetera moderna para descubrir conciertos y experiencias premium con compra rápida, entradas claras y beneficios.
+            Una tiquetera moderna para descubrir conciertos y experiencias premium con compra rápida, entradas claras y beneficios exclusivos.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button href="#events" variant="glow" className="gap-2">
