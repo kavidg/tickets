@@ -33,6 +33,8 @@ import { WebhooksModule } from './modules/webhooks/webhooks.module';
 import { TicketsModule } from './modules/tickets/tickets.module';
 import { CheckInModule } from './modules/check-in/check-in.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { ProfileModule } from './modules/profile/profile.module';
+import { EmailModule } from './modules/email/email.module';
 
 @Module({
   imports: [
@@ -54,6 +56,8 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     TicketsModule,
     CheckInModule,
     DashboardModule,
+    ProfileModule,
+    EmailModule,
   ],
 })
 export class AppModule {}

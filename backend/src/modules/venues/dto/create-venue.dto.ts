@@ -2,6 +2,7 @@
  * TicketS - CreateVenueDto
  *
  * DTO para la creación de un venue/lugar de evento.
+ * organizationId se asigna automáticamente desde el perfil del usuario autenticado.
  * Las validaciones se realizan mediante class-validator.
  *
  * @see venues.controller.ts para el endpoint POST /venues
@@ -18,12 +19,6 @@ import {
 } from 'class-validator';
 
 export class CreateVenueDto {
-  /**
-   * ID de la organización propietaria (requerido).
-   */
-  @IsString({ message: 'La organización es requerida.' })
-  organizationId!: string;
-
   /**
    * Nombre del lugar (requerido).
    * Mínimo 3 caracteres, máximo 200.
@@ -58,12 +53,42 @@ export class CreateVenueDto {
   city!: string;
 
   /**
-   * País (opcional, por defecto se asume país no especificado).
+   * Departamento / Estado / Provincia (opcional).
+   */
+  @IsOptional()
+  @IsString({ message: 'El estado debe ser un texto válido.' })
+  @MaxLength(100, { message: 'El estado no puede exceder 100 caracteres.' })
+  state?: string;
+
+  /**
+   * País (opcional).
    */
   @IsOptional()
   @IsString({ message: 'El país debe ser un texto válido.' })
   @MaxLength(100, { message: 'El país no puede exceder 100 caracteres.' })
   country?: string;
+
+  /**
+   * Código postal (opcional).
+   */
+  @IsOptional()
+  @IsString({ message: 'El código postal debe ser un texto válido.' })
+  @MaxLength(20, { message: 'El código postal no puede exceder 20 caracteres.' })
+  postalCode?: string;
+
+  /**
+   * Latitud (opcional).
+   */
+  @IsOptional()
+  @IsNumber({}, { message: 'La latitud debe ser un número.' })
+  latitude?: number;
+
+  /**
+   * Longitud (opcional).
+   */
+  @IsOptional()
+  @IsNumber({}, { message: 'La longitud debe ser un número.' })
+  longitude?: number;
 
   /**
    * Capacidad máxima de personas (requerido).

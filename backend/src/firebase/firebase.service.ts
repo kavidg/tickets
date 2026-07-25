@@ -32,13 +32,37 @@ export class FirebaseAdminService implements OnModuleInit {
   /**
    * Inicializa Firebase Admin.
    * Si ya existe una app inicializada, la reutiliza.
+   *
+   * Lee las credenciales desde variables de entorno:
+   *   - FIREBASE_PROJECT_ID
+   *   - FIREBASE_CLIENT_EMAIL
+   *   - FIREBASE_PRIVATE_KEY
+   *
+   * O, si no están configuradas, usa Application Default Credentials.
    */
   async onModuleInit() {
     try {
       // Reutilizar app existente o crear nueva
-      this.app = admin.apps.length === 0
-        ? admin.initializeApp()
-        : admin.app();
+      if (admin.apps.length === 0) {
+        const projectId = process.env.FIREBASE_PROJECT_ID;
+        const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+        const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+
+        if (projectId && clientEmail && privateKey) {
+          this.app = admin.initializeApp({
+            credential: admin.credential.cert({
+              projectId,
+              clientEmail,
+              privateKey: privateKey.replace(/\\n/g, '\n'),
+            }),
+          });
+        } else {
+          // Fallback a Application Default Credentials
+          this.app = admin.initializeApp();
+        }
+      } else {
+        this.app = admin.app();
+      }
 
       this.firestoreDb = getFirestore(this.app);
       this.authInstance = getAuth(this.app);

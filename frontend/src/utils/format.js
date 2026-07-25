@@ -1,4 +1,34 @@
 /**
+ * Convierte un Timestamp de Firestore a un objeto Date de JavaScript.
+ *
+ * Soporta:
+ *   - Firestore SDK Timestamp (con toDate())
+ *   - API REST Timestamp ({ _seconds, _nanoseconds })
+ *   - String ISO
+ *   - Date nativo
+ *   - null/undefined (retorna new Date() como fallback)
+ *
+ * @param {any} timestamp
+ * @returns {Date}
+ *
+ * @example
+ * toDate({ _seconds: 1700000000, _nanoseconds: 0 })  → Date
+ * toDate(firestoreTimestamp) → Date
+ * toDate('2026-01-01T00:00:00Z') → Date
+ */
+export function toDate(timestamp) {
+  if (!timestamp) return new Date();
+  // Firestore SDK Timestamp
+  if (typeof timestamp.toDate === 'function') return timestamp.toDate();
+  // API REST Timestamp
+  if (typeof timestamp._seconds === 'number') {
+    return new Date(timestamp._seconds * 1000);
+  }
+  // String ISO o Date nativo
+  return new Date(timestamp);
+}
+
+/**
  * Format a date value into a human-readable string.
  * @param {string|number|Date} value
  * @param {Intl.DateTimeFormatOptions} [options]

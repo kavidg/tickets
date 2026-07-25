@@ -37,6 +37,9 @@ import {
   getEventBySlug,
 } from '../services/event.service';
 
+import { getMyEvents, timestampToDate } from '../services/events.service';
+import type { EventFromApi } from '../services/events.service';
+
 import type { Event } from '../types/event';
 
 // ---------------------------------------------------------------------------
@@ -211,4 +214,82 @@ export function useEvent(slug: string | undefined): UseEventState {
   }, [slug]);
 
   return { event, loading, error, notFound };
+}
+
+// ---------------------------------------------------------------------------
+// useOrganizerEvents
+// ---------------------------------------------------------------------------
+
+/** Estado retornado por useOrganizerEvents() */
+export interface UseOrganizerEventsState {
+  /** Lista de eventos del organizador */
+  events: EventFromApi[];
+  /** Indica si la carga está en progreso */
+  loading: boolean;
+  /** Mensaje de error o null si no hay error */
+  error: string | null;
+  /** Recarga los eventos manualmente */
+  reload: () => void;
+}
+
+/**
+ * Obtiene los eventos del organizador autenticado desde la API NestJS.
+ *
+ * Se ejecuta automáticamente al montar el componente.
+ * Proporciona un método `reload()` para refrescar la lista manualmente,
+ * útil después de crear o eliminar un evento.
+ *
+ * @returns Estado con events[], loading, error y reload().
+ *
+ * @example
+ * const { events, loading, error, reload } = useOrganizerEvents();
+ *
+ * if (loading) return <Spinner />;
+ * if (error) return <ErrorMessage message={error} />;
+ * if (events.length === 0) return <EmptyState onCreate={...} />;
+ * return <EventList events={events} />;
+ */
+export function useOrganizerEvents(): UseOrganizerEventsState {
+  const [events, setEvents] = useState<EventFromApi[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  let cancelled = false;
+
+  const fetchEvents = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await getMyEvents();
+
+      if (cancelled) return;
+
+      if (response.success) {
+        setEvents(response.data ?? []);
+      } else {
+        setError(response.error || 'Error al cargar tus eventos.');
+        setEvents([]);
+      }
+    } catch (err) {
+      if (cancelled) return;
+      setError('Error inesperado al cargar tus eventos.');
+      setEvents([]);
+    } finally {
+      if (!cancelled) {
+        setLoading(false);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    cancelled = false;
+    fetchEvents();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchEvents]);
+
+  return { events, loading, error, reload: fetchEvents };
 }

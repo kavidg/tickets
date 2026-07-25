@@ -1,50 +1,40 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 /**
- * Extract the event ID from the URL hash.
- * Supports patterns: #/event/some-id, #events, #/, #/how-it-works, etc.
+ * Extract the event ID from a pathname string.
+ * Supports patterns: /event/some-id
+ * @param {string} pathname - The full URL path
  * @returns {string}
  */
-function getEventIdFromHash() {
-  const match = window.location.hash.match(/^#\/event\/(.+)$/);
+function getEventIdFromPath(pathname) {
+  const match = pathname.match(/^\/event\/(.+)$/);
   return match ? decodeURIComponent(match[1]) : '';
 }
 
 /**
- * Scroll to the #events section smoothly.
+ * Custom hook that manages client-side routing based on pathname.
+ *
+ * Tracks the current pathname so that ANY navigation change triggers
+ * a React re-render.
+ *
+ * Returns the current event ID derived from the pathname, or '' if on the home page.
+ * @returns {{ eventId: string, pathname: string }}
  */
-function scrollToEventsSection() {
-  requestAnimationFrame(() => {
-    document.getElementById('events')?.scrollIntoView({ behavior: 'smooth' });
-  });
-}
-
-/**
- * Custom hook that manages hash-based client-side routing.
- * Returns the current event ID derived from the hash, or '' if on the home page.
- * @returns {{ eventId: string }}
- */
-export default function useHashRouter() {
-  const [eventId, setEventId] = useState(getEventIdFromHash());
+export default function usePathRouter() {
+  const [pathname, setPathname] = useState(window.location.pathname);
 
   useEffect(() => {
-    const onHashChange = () => {
-      const hash = window.location.hash;
-
-      setEventId(getEventIdFromHash());
-
-      if (hash.startsWith('#/event') || hash === '#/') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-
-      if (hash === '#events') {
-        scrollToEventsSection();
-      }
+    const onPopState = () => {
+      const newPath = window.location.pathname;
+      setPathname(newPath);
     };
 
-    window.addEventListener('hashchange', onHashChange);
-    return () => window.removeEventListener('hashchange', onHashChange);
+    // Listen for popstate (back/forward navigation)
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
   }, []);
 
-  return { eventId };
+  const eventId = useMemo(() => getEventIdFromPath(pathname), [pathname]);
+
+  return { eventId, pathname };
 }

@@ -16,6 +16,8 @@
 export interface Category {
   /** ID del documento en Firestore */
   id: string;
+  /** ID de la organización a la que pertenece */
+  organizationId: string;
   /** Nombre visible de la categoría (ej: "Conciertos", "Teatro") */
   name: string;
   /** Slug único para URLs (ej: "conciertos") */

@@ -2,24 +2,26 @@
  * TicketS - Checkout Response Interface
  *
  * Define la estructura de la respuesta del endpoint POST /api/v1/checkout.
- * Esta respuesta es lo que el frontend recibe después de iniciar el proceso
- * de pago y contiene los datos necesarios para redirigir al usuario a la
- * pasarela de pagos.
+ *
+ * Además de los datos de la compra, incluye la Integrity Signature
+ * necesaria para el Botón de Pagos de Bold:
+ *   - signature: Firma SHA-256 generada con la llave secreta
+ *   - publicKey: Llave pública para que el frontend inicialice Bold SDK
+ *
+ * @see BoldIntegrityService para el algoritmo de firma.
  */
 
-/**
- * Respuesta estandarizada del checkout.
- * El frontend utiliza paymentUrl para redirigir al usuario a la pasarela.
- */
 export interface CheckoutResponse {
   /** ID de la compra asociada */
   purchaseId: string;
-  /** Referencia única del pago en la pasarela */
-  paymentReference: string;
-  /** URL de pago de la pasarela (redirigir al usuario aquí) */
-  paymentUrl: string;
-  /** Nombre del proveedor de pago (bold, mercadopago, etc.) */
-  provider: string;
-  /** Fecha de expiración de la sesión de pago */
-  expiresAt: Date;
+  /** Referencia única generada para esta compra */
+  reference: string;
+  /** Monto total de la compra en la unidad más pequeña de la moneda */
+  amount: number;
+  /** Moneda (COP, USD, etc.) */
+  currency: string;
+  /** Integrity Signature SHA-256 para el Botón de Pagos de Bold */
+  signature: string;
+  /** Llave pública de Bold para inicializar el SDK en el frontend */
+  publicKey: string;
 }

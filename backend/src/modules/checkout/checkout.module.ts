@@ -2,24 +2,22 @@
  * TicketS - CheckoutModule
  *
  * Módulo de checkout responsable de iniciar el proceso de pago.
- * Depende de PaymentsModule para la integración con la pasarela.
+ * Ahora incluye BoldIntegrityService para generar la firma SHA-256
+ * que el Botón de Pagos de Bold requiere.
  *
- * CheckoutModule desacopla completamente la lógica de negocio
- * de los detalles de implementación de la pasarela de pagos.
- *
- * @see PaymentsModule para los proveedores de pago.
  * @see CheckoutService para la lógica de negocio.
+ * @see BoldIntegrityService para la firma de integridad.
  */
 
 import { Module } from '@nestjs/common';
-import { PaymentsModule } from '../../payments/payments.module';
 import { CheckoutController } from './checkout.controller';
 import { CheckoutService } from './checkout.service';
+import { BoldIntegrityService } from './bold-integrity.service';
 
 @Module({
-  imports: [PaymentsModule],
+  imports: [],
   controllers: [CheckoutController],
-  providers: [CheckoutService],
-  exports: [CheckoutService],
+  providers: [CheckoutService, BoldIntegrityService],
+  exports: [CheckoutService, BoldIntegrityService],
 })
 export class CheckoutModule {}

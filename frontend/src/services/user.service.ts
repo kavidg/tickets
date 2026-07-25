@@ -1,14 +1,15 @@
 /**
  * TicketS - Servicio de Usuarios
  *
- * Capa de servicios que encapsula toda la comunicación con Firestore
- * para la gestión de perfiles de usuario.
+ * Capa de servicios para la gestión de perfiles de usuario.
  *
- * Los componentes visuales y hooks NUNCA deben importar firebase/firestore
- * directamente. Siempre deben usar este servicio.
+ * La creación del perfil se realiza a través del backend NestJS
+ * (POST /api/v1/profile) para evitar escritura directa a Firestore.
+ * Las operaciones de lectura aún consultan Firestore directamente
+ * a través del SDK de Firebase.
  *
  * Arquitectura:
- *   Componente → Hook → Service → Firestore
+ *   Componente → Hook → Service → [NestJS API | Firestore SDK]
  *
  * Colección: `users`
  * Documento ID: UID de Firebase Auth
@@ -17,13 +18,13 @@
 import {
   doc,
   getDoc,
-  setDoc,
   updateDoc,
   serverTimestamp,
   type Timestamp,
 } from 'firebase/firestore';
 
 import db from '../firebase/firestore';
+import auth from '../firebase/auth';
 import { COLLECTIONS } from '../constants/firestore';
 import type {
   UserProfile,
@@ -33,15 +34,25 @@ import type {
 } from '../types/user';
 
 // ---------------------------------------------------------------------------
+// Constantes
+// ---------------------------------------------------------------------------
+
+/**
+ * URL base de la API NestJS.
+ */
+const API_URL: string =
+  import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+
+// ---------------------------------------------------------------------------
 // Helpers privados
 // ---------------------------------------------------------------------------
 
 /**
- * Procesa errores de Firestore y devuelve una respuesta estructurada.
+ * Procesa errores y devuelve una respuesta estructurada.
  */
 function handleUserError(error: unknown): UserResponse {
-  const firestoreError = error as { code?: string; message?: string };
-  const code = firestoreError?.code || 'users/unknown';
+  const err = error as { code?: string; message?: string };
+  const code = err?.code || 'users/unknown';
 
   const messages: Record<string, string> = {
     'users/unknown': 'Ocurrió un error inesperado al procesar el perfil.',
@@ -52,9 +63,22 @@ function handleUserError(error: unknown): UserResponse {
 
   return {
     success: false,
-    error: messages[code] || firestoreError?.message || 'Error desconocido.',
+    error: messages[code] || err?.message || 'Error desconocido.',
     code,
   };
+}
+
+/**
+ * Obtiene el token JWT de Firebase Auth.
+ */
+async function getAuthToken(): Promise<string | null> {
+  try {
+    const user = auth.currentUser;
+    if (!user) return null;
+    return await user.getIdToken();
+  } catch {
+    return null;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -62,41 +86,78 @@ function handleUserError(error: unknown): UserResponse {
 // ---------------------------------------------------------------------------
 
 /**
- * Crea el perfil inicial de un usuario en Firestore.
+ * Crea el perfil inicial de un usuario.
  *
- * Debe ejecutarse inmediatamente después del registro exitoso en Firebase Auth.
- * Usa el UID de Firebase Auth como ID del documento.
+ * Utiliza el endpoint POST /api/v1/profile del backend NestJS en lugar de
+ * escribir directamente a Firestore. El uid y email se obtienen del token JWT.
  *
- * @param data - Datos iniciales del perfil (uid, email, displayName opcional, rol opcional).
+ * Importante: esta función solo debe llamarse DESPUÉS de verificar que el
+ * perfil NO existe (GET /api/v1/profile respondió 404). Llamarla cuando el
+ * perfil ya existe resultará en un error 400 del backend.
+ *
+ * @param data - Datos iniciales del perfil (displayName, phone, etc.).
  * @returns UserResponse con el perfil creado o detalles del error.
- *
- * @example
- * const response = await createUserProfile({
- *   uid: 'abc123',
- *   email: 'user@example.com',
- *   displayName: 'María García',
- *   role: 'organizador',
- * });
  */
 export async function createUserProfile(data: CreateUserProfileData): Promise<UserResponse> {
   try {
-    const userRef = doc(db, COLLECTIONS.USERS, data.uid);
+    const token = await getAuthToken();
+    if (!token) {
+      return {
+        success: false,
+        error: 'No hay sesión activa para crear el perfil.',
+        code: 'auth/no-token',
+      };
+    }
+
+    const body: Record<string, unknown> = {};
+    if (data.displayName !== undefined && data.displayName !== null) {
+      body.displayName = data.displayName || '';
+    }
+    if (data.phone) body.phone = data.phone;
+    if (data.city) body.city = data.city;
+    if (data.photoURL) body.photoURL = data.photoURL;
+    if (data.role) {
+      body.role = data.role === 'organizador' ? 'organizer' :
+                  data.role === 'super_admin' ? 'super_admin' :
+                  'cliente';
+    }
+
+    const response = await fetch(`${API_URL}/profile`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: result?.message || result?.error || 'Error al crear el perfil.',
+        code: `api/${response.status}`,
+      };
+    }
+
+    const profileData = result?.data || result;
 
     const profile: UserProfile = {
-      uid: data.uid,
-      email: data.email,
-      displayName: data.displayName || data.email.split('@')[0],
-      photoURL: data.photoURL ?? null,
-      phone: data.phone ?? null,
-      city: data.city ?? null,
-      emailVerified: data.emailVerified ?? false,
-      role: data.role || 'cliente',
-      status: data.status || 'active',
-      createdAt: serverTimestamp() as Timestamp,
-      updatedAt: serverTimestamp() as Timestamp,
+      uid: profileData.uid || '',
+      email: profileData.email || '',
+      displayName: profileData.displayName || '',
+      photoURL: profileData.photoURL ?? null,
+      phone: profileData.phone ?? null,
+      city: profileData.city ?? null,
+      emailVerified: false,
+      role: profileData.role === 'organizer' ? 'organizador' :
+            profileData.role === 'super_admin' ? 'super_admin' :
+            'cliente',
+      status: 'active',
+      createdAt: { seconds: Date.now() / 1000, nanoseconds: 0 } as Timestamp,
+      updatedAt: { seconds: Date.now() / 1000, nanoseconds: 0 } as Timestamp,
     };
-
-    await setDoc(userRef, profile);
 
     return {
       success: true,

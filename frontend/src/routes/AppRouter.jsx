@@ -1,32 +1,31 @@
 /**
  * TicketS - AppRouter
  *
- * Configuración central de enrutamiento organizada por módulos.
+ * Configuración central de enrutamiento para BrowserRouter.
+ * Usa window.location.pathname en lugar de hash para las rutas.
  *
  * Grupos de rutas:
  *
- *   Públicas          → #/, #/event/:id, #events, #/how-it-works
- *   Autenticación     → #/login, #/register, #/forgot-password
- *   Cliente 🔒        → #/my-tickets, #/my-profile, #/my-orders
- *   Organizador 🔒    → #/organizer/dashboard, #/organizer/events
- *   Administrador 🔒  → #/admin, #/admin/users
- *
- * Las rutas protegidas (🔒) usan <ProtectedRoute> que verifica sesión
- * y redirige a #/login si el usuario no está autenticado.
- * Cuando el sistema de roles esté implementado, se añadirá
- * la propiedad `allowedRoles` para restringir por rol.
+ *   Públicas          -> /, /event/:id, /checkout, /purchase/success, /tickets/search
+ *   Autenticación     -> /login, /register, /forgot-password
+ *   Cliente           -> /my-tickets, /my-profile, /my-orders
+ *   Organizador       -> /organizer/dashboard, /organizer/events
+ *   Administrador     -> /admin, /admin/users
  */
 
-import useHashRouter from '../hooks/useHashRouter.js';
+import usePathRouter from '../hooks/useHashRouter.js';
 import ProtectedRoute from './ProtectedRoute';
 import Header from '../components/layout/Header.jsx';
 import Footer from '../components/layout/Footer.jsx';
 
-// Páginas públicas existentes
+// Páginas públicas
 import HomePage from '../pages/HomePage.jsx';
 import EventDetailPage from '../pages/EventDetailPage.jsx';
+import CheckoutPage from '../pages/CheckoutPage';
+import TicketLookupPage from '../pages/TicketLookupPage.jsx';
+import PurchaseSuccessPage from '../pages/PurchaseSuccessPage';
 
-// Páginas de autenticación (públicas)
+// Páginas de autenticación
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
 import ForgotPasswordPage from '../pages/ForgotPasswordPage';
@@ -37,22 +36,19 @@ import MyProfilePage from '../pages/MyProfilePage';
 
 // Páginas de organizador (protegidas)
 import OrganizerDashboardPage from '../pages/OrganizerDashboardPage';
+import OrganizerEventsPage from '../pages/OrganizerEventsPage';
+import OrganizerEventManagePage from '../pages/OrganizerEventManagePage';
+import OrganizerTicketTypesPage from '../pages/OrganizerTicketTypesPage';
+import OrganizationSetupPage from '../pages/OrganizationSetupPage';
+import CreateEventPage from '../pages/CreateEventPage';
+import VenuesPage from '../pages/VenuesPage';
 
 // Páginas de administrador (protegidas)
 import AdminPanelPage from '../pages/AdminPanelPage';
+import CategoriesPage from '../pages/CategoriesPage';
 
 import { ROUTE_PREFIXES } from '../constants/routes';
 
-// ---------------------------------------------------------------------------
-// Resolución de rutas
-// ---------------------------------------------------------------------------
-
-/**
- * Renderiza un placeholder genérico para páginas aún no implementadas.
- * @param {string} title - Título de la página
- * @param {string} description - Descripción breve
- * @returns {React.ReactNode}
- */
 function pagePlaceholder(title, description) {
   return (
     <main className="mx-auto px-4 py-20 text-center">
@@ -63,92 +59,72 @@ function pagePlaceholder(title, description) {
   );
 }
 
-/**
- * Determina qué página renderizar según el hash actual de la URL.
- *
- * @param {string} eventId - ID del evento extraído del hash (o '' si no aplica)
- * @param {string} hash - Hash completo de la URL
- * @returns {React.ReactNode} Componente de página a renderizar
- */
-function resolveRoute(eventId, hash) {
-  // =====================================================================
-  // 1. Ruta pública: detalle de evento
-  // =====================================================================
+function resolveRoute(eventId, pathname) {
   if (eventId) {
     return <EventDetailPage eventId={eventId} />;
   }
 
-  // =====================================================================
-  // 2. Rutas de autenticación (públicas, sin protección)
-  // =====================================================================
-  if (hash === ROUTE_PREFIXES.AUTH) return <LoginPage />;
-  if (hash === '#/register') return <RegisterPage />;
-  if (hash === '#/forgot-password') return <ForgotPasswordPage />;
+  if (pathname === '/checkout') return <CheckoutPage />;
+  if (pathname === '/purchase/success') return <PurchaseSuccessPage />;
+  if (pathname === '/tickets/search') return <TicketLookupPage />;
 
-  // =====================================================================
-  // 3. Rutas de cliente (protegidas)
-  //    Futuro: añadir allowedRoles={['cliente', 'organizador', 'super_admin']}
-  // =====================================================================
-  if (hash.startsWith(ROUTE_PREFIXES.CLIENT)) {
+  if (pathname === '/login') return <LoginPage />;
+  if (pathname === '/register') return <RegisterPage />;
+  if (pathname === '/forgot-password') return <ForgotPasswordPage />;
+
+  if (pathname.startsWith(ROUTE_PREFIXES.CLIENT)) {
     return (
       <ProtectedRoute>
-        {hash === '#/my-tickets' && <MyTicketsPage />}
-        {hash === '#/my-profile' && <MyProfilePage />}
-        {hash === '#/my-orders' && pagePlaceholder('Mis pedidos', 'Historial de compras y estado de tus pedidos.')}
+        {pathname === '/my-tickets' && <MyTicketsPage />}
+        {pathname === '/my-profile' && <MyProfilePage />}
+        {pathname === '/my-orders' && pagePlaceholder('Mis pedidos', 'Historial de compras y estado de tus pedidos.')}
       </ProtectedRoute>
     );
   }
 
-  // =====================================================================
-  // 4. Rutas de organizador (protegidas)
-  //    Futuro: añadir allowedRoles={['organizador', 'super_admin']}
-  // =====================================================================
-  if (hash.startsWith(ROUTE_PREFIXES.ORGANIZER)) {
+  if (pathname === '/organization/setup') {
     return (
       <ProtectedRoute>
-        {hash === '#/organizer/dashboard' && <OrganizerDashboardPage />}
-        {hash === '#/organizer/events' && pagePlaceholder('Mis eventos', 'Administra los eventos de tu organización.')}
-        {hash === '#/organizer/settings' && pagePlaceholder('Configuración', 'Ajustes de tu organización.')}
+        <OrganizationSetupPage />
       </ProtectedRoute>
     );
   }
 
-  // =====================================================================
-  // 5. Rutas de administración (protegidas)
-  //    Futuro: añadir allowedRoles={['super_admin']}
-  // =====================================================================
-  if (hash.startsWith(ROUTE_PREFIXES.ADMIN)) {
+  if (pathname.startsWith(ROUTE_PREFIXES.ORGANIZER)) {
     return (
       <ProtectedRoute>
-        {hash === '#/admin' && <AdminPanelPage />}
-        {hash === '#/admin/users' && pagePlaceholder('Usuarios', 'Gestiona los usuarios de la plataforma.')}
-        {hash === '#/admin/settings' && pagePlaceholder('Configuración global', 'Ajustes generales de la plataforma.')}
+        {pathname === '/organizer/dashboard' && <OrganizerDashboardPage />}
+        {pathname === '/organizer/events/create' && <CreateEventPage />}
+        {pathname === '/organizer/events' && <OrganizerEventsPage />}
+        {pathname === '/organizer/venues' && <VenuesPage />}
+        {pathname.match(/^\/organizer\/events\/manage\/([^/]+)\/tickets$/) && <OrganizerTicketTypesPage />}
+        {pathname.match(/^\/organizer\/events\/manage\/(.+)$/) && <OrganizerEventManagePage />}
+        {pathname === '/organizer/settings' && pagePlaceholder('Configuración', 'Ajustes de tu organización.')}
       </ProtectedRoute>
     );
   }
 
-  // =====================================================================
-  // 6. Ruta por defecto: página principal
-  // =====================================================================
+  if (pathname.startsWith(ROUTE_PREFIXES.ADMIN)) {
+    return (
+      <ProtectedRoute>
+        {pathname === '/admin' && <AdminPanelPage />}
+        {pathname === '/admin/categories' && <CategoriesPage />}
+        {pathname === '/admin/users' && pagePlaceholder('Usuarios', 'Gestiona los usuarios de la plataforma.')}
+        {pathname === '/admin/settings' && pagePlaceholder('Configuración global', 'Ajustes generales de la plataforma.')}
+      </ProtectedRoute>
+    );
+  }
+
   return <HomePage />;
 }
 
-// ---------------------------------------------------------------------------
-// Componente raíz
-// ---------------------------------------------------------------------------
-
-/**
- * Componente raíz de enrutamiento.
- * Renderiza el layout general (Header + contenido + Footer).
- */
 export default function AppRouter() {
-  const { eventId } = useHashRouter();
-  const hash = window.location.hash;
+  const { eventId, pathname } = usePathRouter();
 
   return (
     <div className="min-h-screen bg-luxe-black font-sans text-red-50 antialiased">
       <Header />
-      {resolveRoute(eventId, hash)}
+      {resolveRoute(eventId, pathname)}
       <Footer />
     </div>
   );

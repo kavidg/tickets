@@ -9,7 +9,7 @@ import Button from '../../../components/ui/Button.jsx';
 export default function EventCard({ event }) {
   return (
     <article className="group overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/[0.055] shadow-2xl shadow-black/35 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-luxe-ember/30 hover:shadow-red-glow">
-      <a href={`#/event/${event.id}`} className="block overflow-hidden">
+      <a href={`/event/${event.id}`} className="block overflow-hidden">
         <img className="h-56 w-full object-cover brightness-75 contrast-110 saturate-[0.85] transition duration-500 group-hover:scale-105 group-hover:brightness-90" src={event.image} alt={event.title} />
       </a>
       <div className="p-5">
@@ -22,7 +22,7 @@ export default function EventCard({ event }) {
           <p className="flex items-center gap-2"><Calendar className="h-4 w-4 text-luxe-ember" /> {formatDate(event.date)}</p>
           <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-luxe-ember" /> {event.location}</p>
         </div>
-        <Button href={`#/event/${event.id}`} className="mt-5 w-full">Ver entradas</Button>
+        <Button href={`/event/${event.id}`} className="mt-5 w-full">Ver entradas</Button>
       </div>
     </article>
   );

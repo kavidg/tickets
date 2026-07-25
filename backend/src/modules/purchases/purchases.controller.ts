@@ -2,7 +2,9 @@
  * TicketS - PurchasesController
  *
  * Controlador de compras.
- * Todos los endpoints requieren autenticación mediante FirebaseAuthGuard.
+ *
+ * El endpoint de creación (POST /) es público — no requiere autenticación.
+ * Los endpoints de consulta (my, :id) requieren FirebaseAuthGuard.
  *
  * La creación de compras valida precios desde Firestore y asigna
  * automáticamente el estado 'pending'.
@@ -28,33 +30,34 @@ import { UpdatePurchaseStatusDto } from './dto/update-purchase-status.dto';
 import type { CurrentUser as CurrentUserInterface } from '../auth/interfaces/current-user.interface';
 import type { Purchase } from './interfaces/purchase.interface';
 
-@Controller('api/v1/purchases')
-@UseGuards(FirebaseAuthGuard)
+@Controller('purchases')
 export class PurchasesController {
   constructor(private readonly purchasesService: PurchasesService) {}
 
   /**
-   * Crea una nueva orden de compra.
+   * POST /api/v1/purchases
    *
-   * @param dto - Datos de creación (eventId, organizationId, items[]).
-   * @param user - Usuario autenticado (comprador).
+   * Crea una nueva orden de compra.
+   * Endpoint público — no requiere autenticación.
+   * Los datos del comprador se envían en el body (buyer.name, buyer.email, buyer.phone).
+   *
+   * @param dto - Datos de creación (eventId, organizationId, items[], buyer).
    * @returns La Purchase creada con status 'pending'.
    */
   @Post()
-  async create(
-    @Body() dto: CreatePurchaseDto,
-    @CurrentUser() user: CurrentUserInterface,
-  ): Promise<Purchase> {
-    return this.purchasesService.create(dto, user);
+  async create(@Body() dto: CreatePurchaseDto): Promise<Purchase> {
+    return this.purchasesService.create(dto);
   }
 
   /**
    * Obtiene las compras del usuario autenticado.
+   * Requiere autenticación.
    *
    * @param user - Usuario autenticado.
    * @returns Lista de compras del usuario.
    */
   @Get('my')
+  @UseGuards(FirebaseAuthGuard)
   async getMyPurchases(
     @CurrentUser() user: CurrentUserInterface,
   ): Promise<Purchase[]> {
@@ -64,12 +67,14 @@ export class PurchasesController {
   /**
    * Obtiene una compra por su ID.
    * Solo el comprador o el owner de la organización pueden acceder.
+   * Requiere autenticación.
    *
    * @param id - ID de la Purchase.
    * @param user - Usuario autenticado.
    * @returns La Purchase encontrada.
    */
   @Get(':id')
+  @UseGuards(FirebaseAuthGuard)
   async getById(
     @Param('id') id: string,
     @CurrentUser() user: CurrentUserInterface,

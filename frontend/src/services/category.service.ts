@@ -1,47 +1,107 @@
 /**
- * TicketS - Servicio de Categorías
+ * TicketS - Servicio de Categorías (API REST)
  *
- * Capa de servicios que encapsula toda la comunicación con Firestore
- * para la gestión de categorías de eventos.
+ * Capa de servicios que encapsula la comunicación con la API NestJS
+ * para la gestión de categorías.
  *
- * Colección: `categories`
+ * Arquitectura:
+ *   Componente → Hook → Service (este archivo) → API NestJS → Firestore
+ *
+ * Endpoints:
+ *   GET    /api/v1/categories        → Categorías activas (público)
+ *   GET    /api/v1/categories/all    → Todas (autenticado)
+ *   GET    /api/v1/categories/:id    → Por ID
+ *   POST   /api/v1/categories        → Crear
+ *   PATCH  /api/v1/categories/:id    → Actualizar
+ *   DELETE /api/v1/categories/:id    → Eliminar
  */
 
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  setDoc,
-  updateDoc,
-  serverTimestamp,
-  query,
-  orderBy,
-  type Timestamp,
-} from 'firebase/firestore';
+import auth from '../firebase/auth';
 
-import db from '../firebase/firestore';
-import { COLLECTIONS } from '../constants/firestore';
-import type {
-  Category,
-  CreateCategoryData,
-  UpdateCategoryData,
-  EventResponse,
-} from '../types/event';
+// ---------------------------------------------------------------------------
+// Constantes
+// ---------------------------------------------------------------------------
+
+const API_URL: string =
+  import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+
+// ---------------------------------------------------------------------------
+// Tipos
+// ---------------------------------------------------------------------------
+
+/** Categoría retornada por la API NestJS */
+export interface CategoryFromApi {
+  id: string;
+  /** ID de la organización a la que pertenece */
+  organizationId: string;
+  name: string;
+  slug: string;
+  description: string;
+  imageUrl: string;
+  active: boolean;
+  createdAt: { _seconds: number; _nanoseconds: number };
+  updatedAt: { _seconds: number; _nanoseconds: number };
+}
+
+/** Respuesta del servicio con array de categorías */
+export interface CategoriesResponse {
+  success: boolean;
+  data?: CategoryFromApi[];
+  error?: string;
+}
+
+/** Respuesta del servicio con una categoría individual */
+export interface CategoryResponse {
+  success: boolean;
+  data?: CategoryFromApi;
+  error?: string;
+}
+
+/** Datos para crear una categoría (coincide con CreateCategoryDto del backend) */
+export interface CreateCategoryData {
+  name: string;
+  slug: string;
+  description?: string;
+  imageUrl?: string;
+}
+
+/** Datos para actualizar una categoría (coincide con UpdateCategoryDto del backend) */
+export interface UpdateCategoryData {
+  name?: string;
+  slug?: string;
+  description?: string;
+  imageUrl?: string;
+  active?: boolean;
+}
 
 // ---------------------------------------------------------------------------
 // Helpers privados
 // ---------------------------------------------------------------------------
 
-function handleCategoryError<T>(error: unknown): EventResponse<T> {
-  const firestoreError = error as { code?: string; message?: string };
-  const code = firestoreError?.code || 'categories/unknown';
+/**
+ * Obtiene el token JWT del usuario autenticado.
+ */
+async function getAuthToken(): Promise<string> {
+  const user = auth.currentUser;
+  if (!user) {
+    throw new Error('Debes iniciar sesión para realizar esta operación.');
+  }
+  return user.getIdToken();
+}
 
-  return {
-    success: false,
-    error: firestoreError?.message || 'Error al procesar la categoría.',
-    code,
-  } as EventResponse<T>;
+/**
+ * Maneja errores HTTP de forma consistente.
+ */
+async function handleHttpError(response: Response): Promise<string> {
+  if (response.status === 401) {
+    return 'Tu sesión ha expirado. Inicia sesión nuevamente.';
+  }
+  if (response.status === 409) {
+    const body = await response.json().catch(() => ({}));
+    return body?.message || body?.error || 'El slug ya está en uso.';
+  }
+  const body = await response.json().catch(() => ({}));
+  return body?.message || body?.error || 'Error del servidor.';
 }
 
 // ---------------------------------------------------------------------------
@@ -49,96 +109,249 @@ function handleCategoryError<T>(error: unknown): EventResponse<T> {
 // ---------------------------------------------------------------------------
 
 /**
- * Obtiene todas las categorías activas, ordenadas por nombre.
+ * Obtiene todas las categorías activas (público, sin filtro de organización).
  *
- * @returns Lista de categorías.
+ * GET /api/v1/categories/public
+ * Endpoint público — no requiere autenticación.
+ * Útil para páginas públicas como HomePage y EventDetailPage.
  *
- * @example
- * const { success, data } = await getCategories();
- * if (success) console.log(data);
+ * @returns Lista de categorías activas.
  */
-export async function getCategories(): Promise<EventResponse<Category[]>> {
+export async function getPublicCategoriesApi(): Promise<CategoriesResponse> {
   try {
-    const q = query(
-      collection(db, COLLECTIONS.CATEGORIES),
-      orderBy('name', 'asc'),
-    );
-
-    const snapshot = await getDocs(q);
-    const categories: Category[] = [];
-
-    snapshot.forEach((docSnap) => {
-      categories.push({ id: docSnap.id, ...docSnap.data() } as Category);
+    const response = await fetch(`${API_URL}/categories/public`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
     });
 
-    return { success: true, data: categories };
+    if (!response.ok) {
+      const error = await handleHttpError(response);
+      return { success: false, error };
+    }
+
+    const body = await response.json();
+    const rawCategories: CategoryFromApi[] = body?.data ?? body ?? [];
+    return {
+      success: true,
+      data: Array.isArray(rawCategories) ? rawCategories : [],
+    };
   } catch (error) {
-    return handleCategoryError(error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Error de conexión con el servidor.',
+    };
+  }
+}
+
+/**
+ * Obtiene las categorías activas de la organización del usuario autenticado.
+ *
+ * GET /api/v1/categories
+ * Requiere autenticación.
+ *
+ * @returns Lista de categorías activas de la organización.
+ */
+export async function getMyCategoriesApi(): Promise<CategoriesResponse> {
+  try {
+    const token = await getAuthToken();
+    const response = await fetch(`${API_URL}/categories`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const error = await handleHttpError(response);
+      return { success: false, error };
+    }
+
+    const body = await response.json();
+    const rawCategories: CategoryFromApi[] = body?.data ?? body ?? [];
+    return {
+      success: true,
+      data: Array.isArray(rawCategories) ? rawCategories : [],
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Error de conexión con el servidor.',
+    };
+  }
+}
+
+/**
+ * Obtiene todas las categorías (activas e inactivas).
+ * Requiere autenticación.
+ *
+ * GET /api/v1/categories/all
+ *
+ * @returns Lista completa de categorías.
+ */
+export async function getAllCategoriesApi(): Promise<CategoriesResponse> {
+  try {
+    const token = await getAuthToken();
+    const response = await fetch(`${API_URL}/categories/all`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const error = await handleHttpError(response);
+      return { success: false, error };
+    }
+
+    const body = await response.json();
+    const rawCategories: CategoryFromApi[] = body?.data ?? body ?? [];
+    return {
+      success: true,
+      data: Array.isArray(rawCategories) ? rawCategories : [],
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Error de conexión con el servidor.',
+    };
   }
 }
 
 /**
  * Crea una nueva categoría.
  *
+ * POST /api/v1/categories
+ *
  * @param data - Datos de la categoría a crear.
  * @returns La categoría creada.
- *
- * @example
- * const response = await createCategory({
- *   name: 'Música',
- *   slug: 'musica',
- *   description: 'Eventos musicales',
- * });
  */
-export async function createCategory(data: CreateCategoryData): Promise<EventResponse<Category>> {
+export async function createCategoryApi(
+  data: CreateCategoryData,
+): Promise<CategoryResponse> {
   try {
-    const ref = doc(collection(db, COLLECTIONS.CATEGORIES));
+    const token = await getAuthToken();
+    const response = await fetch(`${API_URL}/categories`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
 
-    const category: Category = {
-      id: ref.id,
-      name: data.name,
-      slug: data.slug,
-      description: data.description || '',
-      imageUrl: data.imageUrl || '',
-      active: data.active ?? true,
-      createdAt: serverTimestamp() as Timestamp,
-      updatedAt: serverTimestamp() as Timestamp,
-    };
+    if (!response.ok) {
+      const error = await handleHttpError(response);
+      return { success: false, error };
+    }
 
-    await setDoc(ref, category);
-
-    return { success: true, data: category };
+    const body = await response.json();
+    const category: CategoryFromApi = body?.data ?? body;
+    return category?.id
+      ? { success: true, data: category }
+      : { success: false, error: 'Error al crear la categoría.' };
   } catch (error) {
-    return handleCategoryError(error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Error de conexión con el servidor.',
+    };
   }
 }
 
 /**
  * Actualiza una categoría existente.
  *
- * @param id - ID del documento en Firestore.
- * @param data - Campos a actualizar.
- * @returns La categoría actualizada.
+ * PATCH /api/v1/categories/:id
  *
- * @example
- * const response = await updateCategory('abc123', { active: false });
+ * @param id - ID de la categoría.
+ * @param data - Datos a actualizar.
+ * @returns La categoría actualizada.
  */
-export async function updateCategory(id: string, data: UpdateCategoryData): Promise<EventResponse<Category>> {
+export async function updateCategoryApi(
+  id: string,
+  data: UpdateCategoryData,
+): Promise<CategoryResponse> {
   try {
-    const ref = doc(db, COLLECTIONS.CATEGORIES, id);
+    const token = await getAuthToken();
+    const response = await fetch(
+      `${API_URL}/categories/${encodeURIComponent(id)}`,
+      {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      },
+    );
 
-    const updateData = {
-      ...data,
-      updatedAt: serverTimestamp(),
-    };
+    if (!response.ok) {
+      const error = await handleHttpError(response);
+      return { success: false, error };
+    }
 
-    await updateDoc(ref, updateData);
-
-    const docSnap = await getDoc(ref);
-    const category = { id: docSnap.id, ...docSnap.data() } as Category;
-
-    return { success: true, data: category };
+    const body = await response.json();
+    return { success: true, data: body?.data ?? body };
   } catch (error) {
-    return handleCategoryError(error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Error de conexión con el servidor.',
+    };
+  }
+}
+
+/**
+ * Elimina una categoría.
+ *
+ * DELETE /api/v1/categories/:id
+ *
+ * @param id - ID de la categoría a eliminar.
+ */
+export async function deleteCategoryApi(
+  id: string,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const token = await getAuthToken();
+    const response = await fetch(
+      `${API_URL}/categories/${encodeURIComponent(id)}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    if (!response.ok) {
+      const error = await handleHttpError(response);
+      return { success: false, error };
+    }
+
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Error de conexión con el servidor.',
+    };
   }
 }

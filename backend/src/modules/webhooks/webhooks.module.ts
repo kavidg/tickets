@@ -15,11 +15,12 @@
 import { Module } from '@nestjs/common';
 import { InventoryModule } from '../inventory/inventory.module';
 import { TicketsModule } from '../tickets/tickets.module';
+import { EmailModule } from '../email/email.module';
 import { WebhooksController } from './webhooks.controller';
 import { WebhookService } from './webhooks.service';
 
 @Module({
-  imports: [InventoryModule, TicketsModule],
+  imports: [InventoryModule, TicketsModule, EmailModule],
   controllers: [WebhooksController],
   providers: [WebhookService],
   exports: [WebhookService],

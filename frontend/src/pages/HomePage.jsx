@@ -5,17 +5,7 @@ import Filters from '../features/events/components/Filters.jsx';
 import Hero from '../features/marketing/components/Hero.jsx';
 import { useEvents } from '../hooks/useEvents';
 import { useCategories } from '../hooks/useCategories';
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-/**
- * Convierte un Timestamp de Firestore a un objeto Date.
- */
-function toDate(timestamp) {
-  return timestamp?.toDate ? timestamp.toDate() : new Date(timestamp);
-}
+import { toDate } from '../utils/format.js';
 
 /**
  * Filtra eventos por categoría y rango de fechas (client-side).
@@ -175,6 +165,16 @@ export default function HomePage() {
               <h2 className="mt-2 text-3xl font-black tracking-tight text-white">
                 Eventos con alta demanda
               </h2>
+              <div className="mt-6 flex justify-center">
+                <button
+                  onClick={() => {
+                    window.location.href = '/checkout';
+                  }}
+                  className="rounded-xl bg-emerald-500 px-8 py-4 text-lg font-bold text-white shadow-lg transition hover:bg-emerald-600"
+                >
+                  🎟️ Comprar
+                </button>
+              </div>
             </div>
             {!loading && !catLoading && !error && !catError && (
               <p className="hidden rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-bold text-red-100/65 shadow-lg shadow-black/25 backdrop-blur-xl sm:block">

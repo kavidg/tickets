@@ -1,60 +1,118 @@
 /**
- * TicketS - Servicio de Lugares (Venues)
+ * TicketS - Servicio de Lugares (Venues) — API REST
  *
- * Capa de servicios que encapsula toda la comunicación con Firestore
- * para la gestión de lugares físicos donde se realizan eventos.
+ * Capa de servicios que encapsula la comunicación con la API NestJS
+ * para la gestión de lugares físicos de eventos.
  *
- * Colección: `venues`
- *
- * Validaciones:
- *   - name es requerido.
- *   - city es requerida.
+ * Endpoints:
+ *   GET  /api/v1/venues/public   → Público, venues activos
+ *   GET  /api/v1/venues          → Auth, venues activos de la org
+ *   GET  /api/v1/venues/all      → Auth, todos los venues de la org
+ *   GET  /api/v1/venues/:id      → Por ID
+ *   POST /api/v1/venues          → Crear
+ *   PATCH /api/v1/venues/:id     → Actualizar
+ *   DELETE /api/v1/venues/:id    → Eliminar
  */
 
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  setDoc,
-  updateDoc,
-  serverTimestamp,
-  query,
-  orderBy,
-  type Timestamp,
-} from 'firebase/firestore';
+import auth from '../firebase/auth';
 
-import db from '../firebase/firestore';
-import { COLLECTIONS } from '../constants/firestore';
-import type {
-  Venue,
-  CreateVenueData,
-  UpdateVenueData,
-} from '../types/venue';
-import type { EventResponse } from '../types/event';
+// ---------------------------------------------------------------------------
+// Constantes
+// ---------------------------------------------------------------------------
+
+const API_URL: string =
+  import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+
+// ---------------------------------------------------------------------------
+// Tipos
+// ---------------------------------------------------------------------------
+
+/** Venue retornado por la API NestJS */
+export interface VenueFromApi {
+  id: string;
+  organizationId: string;
+  name: string;
+  description: string;
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+  postalCode: string;
+  latitude: number | null;
+  longitude: number | null;
+  capacity: number;
+  imageUrl: string;
+  active: boolean;
+  createdAt: { _seconds: number; _nanoseconds: number };
+  updatedAt: { _seconds: number; _nanoseconds: number };
+}
+
+/** Respuesta del servicio con array de venues */
+export interface VenuesResponse {
+  success: boolean;
+  data?: VenueFromApi[];
+  error?: string;
+}
+
+/** Respuesta del servicio con un venue individual */
+export interface VenueResponse {
+  success: boolean;
+  data?: VenueFromApi;
+  error?: string;
+}
+
+/** Datos para crear un venue */
+export interface CreateVenueData {
+  name: string;
+  description?: string;
+  address: string;
+  city: string;
+  state?: string;
+  country?: string;
+  postalCode?: string;
+  latitude?: number;
+  longitude?: number;
+  capacity: number;
+  imageUrl?: string;
+}
+
+/** Datos para actualizar un venue */
+export interface UpdateVenueData {
+  name?: string;
+  description?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  postalCode?: string;
+  latitude?: number;
+  longitude?: number;
+  capacity?: number;
+  imageUrl?: string;
+  active?: boolean;
+}
 
 // ---------------------------------------------------------------------------
 // Helpers privados
 // ---------------------------------------------------------------------------
 
-function handleVenueError<T>(error: unknown): EventResponse<T> {
-  const firestoreError = error as { code?: string; message?: string };
-  const code = firestoreError?.code || 'venues/unknown';
-
-  return {
-    success: false,
-    error: firestoreError?.message || 'Error al procesar el lugar.',
-    code,
-  } as EventResponse<T>;
+async function getAuthToken(): Promise<string> {
+  const user = auth.currentUser;
+  if (!user) {
+    throw new Error('Debes iniciar sesión para realizar esta operación.');
+  }
+  return user.getIdToken();
 }
 
-/**
- * Valida los campos requeridos para crear un venue.
- */
-function validateVenueData(data: CreateVenueData): string | null {
-  if (!data.name?.trim()) return 'El nombre del lugar es requerido.';
-  if (!data.city?.trim()) return 'La ciudad es requerida.';
-  return null;
+async function handleHttpError(response: Response): Promise<string> {
+  if (response.status === 401) {
+    return 'Tu sesión ha expirado. Inicia sesión nuevamente.';
+  }
+  if (response.status === 403) {
+    return 'No tienes permisos para realizar esta operación.';
+  }
+  const body = await response.json().catch(() => ({}));
+  return body?.message || body?.error || 'Error del servidor.';
 }
 
 // ---------------------------------------------------------------------------
@@ -62,137 +120,215 @@ function validateVenueData(data: CreateVenueData): string | null {
 // ---------------------------------------------------------------------------
 
 /**
- * Obtiene todos los venues activos, ordenados por nombre.
- *
- * @returns Lista de venues.
- *
- * @example
- * const { data: venues } = await getVenues();
+ * Obtiene todos los venues activos (público, sin auth).
+ * GET /api/v1/venues/public
  */
-export async function getVenues(): Promise<EventResponse<Venue[]>> {
+export async function getPublicVenuesApi(): Promise<VenuesResponse> {
   try {
-    const q = query(
-      collection(db, COLLECTIONS.VENUES),
-      orderBy('name', 'asc'),
-    );
-
-    const snapshot = await getDocs(q);
-    const venues: Venue[] = [];
-
-    snapshot.forEach((docSnap) => {
-      venues.push({ id: docSnap.id, ...docSnap.data() } as Venue);
+    const response = await fetch(`${API_URL}/venues/public`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
     });
 
-    return { success: true, data: venues };
+    if (!response.ok) {
+      const error = await handleHttpError(response);
+      return { success: false, error };
+    }
+
+    const body = await response.json();
+    const raw: VenueFromApi[] = body?.data ?? body ?? [];
+    return { success: true, data: Array.isArray(raw) ? raw : [] };
   } catch (error) {
-    return handleVenueError(error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Error de conexión con el servidor.',
+    };
   }
 }
 
 /**
- * Obtiene un venue por su ID.
- *
- * @param id - ID del documento en Firestore.
- * @returns El venue encontrado o error si no existe.
- *
- * @example
- * const { success, data } = await getVenueById('abc123');
+ * Obtiene los venues activos de la organización del usuario autenticado.
+ * GET /api/v1/venues
  */
-export async function getVenueById(id: string): Promise<EventResponse<Venue>> {
+export async function getMyVenuesApi(): Promise<VenuesResponse> {
   try {
-    const ref = doc(db, COLLECTIONS.VENUES, id);
-    const docSnap = await getDoc(ref);
+    const token = await getAuthToken();
+    const response = await fetch(`${API_URL}/venues`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
 
-    if (!docSnap.exists()) {
-      return {
-        success: false,
-        error: 'Lugar no encontrado.',
-        code: 'not-found',
-      };
+    if (!response.ok) {
+      const error = await handleHttpError(response);
+      return { success: false, error };
     }
 
-    const venue = { id: docSnap.id, ...docSnap.data() } as Venue;
-    return { success: true, data: venue };
+    const body = await response.json();
+    const raw: VenueFromApi[] = body?.data ?? body ?? [];
+    return { success: true, data: Array.isArray(raw) ? raw : [] };
   } catch (error) {
-    return handleVenueError(error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Error de conexión con el servidor.',
+    };
+  }
+}
+
+/**
+ * Obtiene todos los venues (activos e inactivos) de la organización.
+ * GET /api/v1/venues/all
+ */
+export async function getAllVenuesApi(): Promise<VenuesResponse> {
+  try {
+    const token = await getAuthToken();
+    const response = await fetch(`${API_URL}/venues/all`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const error = await handleHttpError(response);
+      return { success: false, error };
+    }
+
+    const body = await response.json();
+    const raw: VenueFromApi[] = body?.data ?? body ?? [];
+    return { success: true, data: Array.isArray(raw) ? raw : [] };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Error de conexión con el servidor.',
+    };
   }
 }
 
 /**
  * Crea un nuevo venue.
- *
- * @param data - Datos del venue (name y city son requeridos).
- * @returns El venue creado o error de validación.
- *
- * @example
- * const response = await createVenue({
- *   name: 'Centro de Eventos, Acopi',
- *   city: 'Cali',
- *   capacity: 5000,
- * });
+ * POST /api/v1/venues
  */
-export async function createVenue(data: CreateVenueData): Promise<EventResponse<Venue>> {
-  // Validar campos requeridos
-  const validationError = validateVenueData(data);
-  if (validationError) {
+export async function createVenueApi(
+  data: CreateVenueData,
+): Promise<VenueResponse> {
+  try {
+    const token = await getAuthToken();
+    const response = await fetch(`${API_URL}/venues`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await handleHttpError(response);
+      return { success: false, error };
+    }
+
+    const body = await response.json();
+    const venue: VenueFromApi = body?.data ?? body;
+    return venue?.id
+      ? { success: true, data: venue }
+      : { success: false, error: 'Error al crear el lugar.' };
+  } catch (error) {
     return {
       success: false,
-      error: validationError,
-      code: 'validation-error',
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Error de conexión con el servidor.',
     };
-  }
-
-  try {
-    const ref = doc(collection(db, COLLECTIONS.VENUES));
-
-    const venue: Venue = {
-      id: ref.id,
-      name: data.name.trim(),
-      description: data.description || '',
-      address: data.address || '',
-      city: data.city.trim(),
-      country: data.country || 'Colombia',
-      capacity: data.capacity ?? 0,
-      imageUrl: data.imageUrl || '',
-      active: data.active ?? true,
-      createdAt: serverTimestamp() as Timestamp,
-      updatedAt: serverTimestamp() as Timestamp,
-    };
-
-    await setDoc(ref, venue);
-
-    return { success: true, data: venue };
-  } catch (error) {
-    return handleVenueError(error);
   }
 }
 
 /**
  * Actualiza un venue existente.
- *
- * @param id - ID del documento en Firestore.
- * @param data - Campos a actualizar.
- * @returns El venue actualizado.
- *
- * @example
- * const response = await updateVenue('abc123', { capacity: 6000 });
+ * PATCH /api/v1/venues/:id
  */
-export async function updateVenue(id: string, data: UpdateVenueData): Promise<EventResponse<Venue>> {
+export async function updateVenueApi(
+  id: string,
+  data: UpdateVenueData,
+): Promise<VenueResponse> {
   try {
-    const ref = doc(db, COLLECTIONS.VENUES, id);
+    const token = await getAuthToken();
+    const response = await fetch(
+      `${API_URL}/venues/${encodeURIComponent(id)}`,
+      {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      },
+    );
 
-    const updateData = {
-      ...data,
-      updatedAt: serverTimestamp(),
-    };
+    if (!response.ok) {
+      const error = await handleHttpError(response);
+      return { success: false, error };
+    }
 
-    await updateDoc(ref, updateData);
-
-    const docSnap = await getDoc(ref);
-    const venue = { id: docSnap.id, ...docSnap.data() } as Venue;
-
-    return { success: true, data: venue };
+    const body = await response.json();
+    return { success: true, data: body?.data ?? body };
   } catch (error) {
-    return handleVenueError(error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Error de conexión con el servidor.',
+    };
+  }
+}
+
+/**
+ * Elimina un venue.
+ * DELETE /api/v1/venues/:id
+ */
+export async function deleteVenueApi(
+  id: string,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const token = await getAuthToken();
+    const response = await fetch(
+      `${API_URL}/venues/${encodeURIComponent(id)}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    if (!response.ok) {
+      const error = await handleHttpError(response);
+      return { success: false, error };
+    }
+
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Error de conexión con el servidor.',
+    };
   }
 }

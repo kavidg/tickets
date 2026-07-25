@@ -65,11 +65,11 @@ export class UpdateEventDto {
   categoryId?: string;
 
   /**
-   * ID de la organización organizadora (opcional).
+   * Nombre de la categoría para modo demo (opcional).
    */
   @IsOptional()
-  @IsString({ message: 'La organización debe ser un texto válido.' })
-  organizationId?: string;
+  @IsString({ message: 'El nombre de la categoría debe ser un texto válido.' })
+  categoryName?: string;
 
   /**
    * ID del lugar/venue (opcional).
@@ -77,6 +77,13 @@ export class UpdateEventDto {
   @IsOptional()
   @IsString({ message: 'El lugar debe ser un texto válido.' })
   venueId?: string;
+
+  /**
+   * Nombre del lugar/venue para modo demo (opcional).
+   */
+  @IsOptional()
+  @IsString({ message: 'El nombre del lugar debe ser un texto válido.' })
+  venueName?: string;
 
   /**
    * URL del banner o imagen principal (opcional).

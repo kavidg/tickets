@@ -7,14 +7,13 @@
  *
  * Flujo post-registro:
  *   1. Crear usuario en Firebase Auth vía useAuth().register()
- *   2. Obtener UID del usuario creado
- *   3. Crear perfil en Firestore con rol 'cliente' y estado 'active'
- *   4. Redirigir al Home
+ *   2. Enviar correo de verificación
+ *   3. Redirigir al Home — ProtectedRoute se encarga de crear el perfil
+ *      (GET /api/v1/profile → si 404 → POST /api/v1/profile)
  */
 
 import { useState, type FormEvent } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { createUserProfile } from '../services/user.service';
 import Button from '../components/ui/Button';
 
 export default function RegisterPage() {
@@ -72,37 +71,12 @@ export default function RegisterPage() {
         return;
       }
 
-      const uid = authResponse.user?.uid;
-      const userEmail = authResponse.user?.email;
+      // 2. Enviar correo de verificación
+      await sendVerificationEmail();
 
-      if (!uid) {
-        setError('Error al obtener los datos del usuario.');
-        setSubmitting(false);
-        return;
-      }
-
-      // 2. Crear perfil en Firestore con emailVerified: false
-      const profileResponse = await createUserProfile({
-        uid,
-        email: userEmail || email.trim(),
-        displayName: displayName.trim(),
-        role: 'cliente',
-        status: 'active',
-        emailVerified: false,
-      });
-
-      if (!profileResponse.success) {
-        console.error('Error al crear perfil en Firestore:', profileResponse.error);
-      }
-
-      // 3. Enviar correo de verificación
-      const verificationResponse = await sendVerificationEmail();
-      if (!verificationResponse.success) {
-        console.error('Error al enviar correo de verificación:', verificationResponse.error);
-      }
-
-      // 4. Redirigir al Home
-      window.location.hash = '#/';
+      // 3. Redirigir al Home — ProtectedRoute se encarga de crear el perfil
+      //    (GET /api/v1/profile → si 404 → POST /api/v1/profile)
+      window.location.href = '/';
     } catch (err) {
       setError('Ocurrió un error inesperado. Intenta de nuevo.');
       setSubmitting(false);
@@ -249,7 +223,7 @@ export default function RegisterPage() {
           {/* Enlace a Login */}
           <div className="mt-6 text-center text-sm">
             <a
-              href="#/login"
+              href="/login"
               className="font-semibold text-red-100/50 transition hover:text-luxe-ember"
             >
               ¿Ya tienes cuenta? Inicia sesión

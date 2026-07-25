@@ -21,13 +21,6 @@ import {
 
 export class UpdateVenueDto {
   /**
-   * ID de la organización propietaria (opcional).
-   */
-  @IsOptional()
-  @IsString({ message: 'La organización debe ser un texto válido.' })
-  organizationId?: string;
-
-  /**
    * Nombre del lugar (opcional).
    */
   @IsOptional()
@@ -63,12 +56,42 @@ export class UpdateVenueDto {
   city?: string;
 
   /**
+   * Departamento / Estado / Provincia (opcional).
+   */
+  @IsOptional()
+  @IsString({ message: 'El estado debe ser un texto válido.' })
+  @MaxLength(100, { message: 'El estado no puede exceder 100 caracteres.' })
+  state?: string;
+
+  /**
    * País (opcional).
    */
   @IsOptional()
   @IsString({ message: 'El país debe ser un texto válido.' })
   @MaxLength(100, { message: 'El país no puede exceder 100 caracteres.' })
   country?: string;
+
+  /**
+   * Código postal (opcional).
+   */
+  @IsOptional()
+  @IsString({ message: 'El código postal debe ser un texto válido.' })
+  @MaxLength(20, { message: 'El código postal no puede exceder 20 caracteres.' })
+  postalCode?: string;
+
+  /**
+   * Latitud (opcional).
+   */
+  @IsOptional()
+  @IsNumber({}, { message: 'La latitud debe ser un número.' })
+  latitude?: number;
+
+  /**
+   * Longitud (opcional).
+   */
+  @IsOptional()
+  @IsNumber({}, { message: 'La longitud debe ser un número.' })
+  longitude?: number;
 
   /**
    * Capacidad máxima de personas (opcional).

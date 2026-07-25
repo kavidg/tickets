@@ -7,17 +7,17 @@
  *
  * Relación:
  *   Una compra (Purchase) genera uno o más tickets (según quantity de cada item).
- *   Cada ticket representa una entrada individual con su propio código QR.
- *   El ticket es validado en el ingreso al evento (check-in).
+ *   Cada ticket representa una entrada individual con su propio código único.
+ *   El código del ticket se codifica en un QR para validar el ingreso (check-in).
  *
  * Flujo:
  *   Purchase (paid)
  *       ↓
- *   createTicketsFromPurchase() → Genera N tickets (1 por item × quantity)
+ *   Backend: createTicketsFromPurchase() → Genera N tickets (1 por item × quantity)
  *       ↓
- *   Cada ticket con qrToken único, status "active"
+ *   Cada ticket con code único (TCK-XXXXXXXX-XXXXXXXXXX), status "active"
  *       ↓
- *   Check-in: updateTicketStatus() → "used" + checkedInAt + checkedInBy
+ *   Check-in: updateTicketStatus() → "used" + usedAt
  */
 
 import type { Timestamp } from 'firebase/firestore';
@@ -64,7 +64,7 @@ export const TICKET_STATUSES: TicketStatus[] = [
  *
  * Cada ticket representa una entrada única para un evento.
  * Se genera automáticamente cuando una compra es marcada como "paid".
- * Cada ticket contiene un qrToken único que se utilizará para generar
+ * Cada ticket contiene un code único que se utiliza para generar
  * el código QR y validar el ingreso.
  */
 export interface Ticket {
@@ -80,47 +80,20 @@ export interface Ticket {
   userId: string;
   /** ID del tipo de entrada (TicketType) adquirido */
   ticketTypeId: string;
-  /** Nombre del tipo de entrada al momento de la compra (ej: 'VIP') */
-  ticketTypeName: string;
-  /** Nombre del asistente (puede ser distinto al comprador) */
-  attendeeName: string;
-  /** Email del asistente */
-  attendeeEmail: string;
-  /** Token único para generar el código QR (UUID v4) */
-  qrToken: string;
+  /** Código único del ticket (formato: TCK-XXXXXX-XXXXXXXXXX) */
+  code: string;
   /** Estado del ticket */
   status: TicketStatus;
-  /** Fecha y hora del check-in (cuando se usó el ticket) */
-  checkedInAt: Timestamp | null;
-  /** UID del usuario que realizó el check-in (organizador/validador) */
-  checkedInBy: string;
   /** Fecha de creación */
   createdAt: Timestamp;
-  /** Fecha de la última actualización */
-  updatedAt: Timestamp;
-}
-
-/**
- * Datos para crear tickets a partir de una compra.
- *
- * Este tipo representa los datos mínimos necesarios para generar los tickets
- * después de que una compra es marcada como "paid".
- */
-export interface CreateTicketsFromPurchaseData {
-  purchaseId: string;
-  eventId: string;
-  organizationId: string;
-  userId: string;
+  /** Timestamp de Firestore cuando se realizó el check-in */
+  usedAt?: Timestamp;
 }
 
 /**
  * Datos actualizables de un ticket.
- * Solo ciertos campos pueden modificarse después de creado.
  */
 export interface UpdateTicketData {
   status?: TicketStatus;
-  attendeeName?: string;
-  attendeeEmail?: string;
-  checkedInAt?: Timestamp;
-  checkedInBy?: string;
+  usedAt?: Timestamp;
 }

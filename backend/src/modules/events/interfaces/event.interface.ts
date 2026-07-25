@@ -31,12 +31,16 @@ export interface Event {
   slug: string;
   /** Descripción detallada del evento */
   description: string;
-  /** ID de la categoría a la que pertenece */
-  categoryId: string;
+  /** ID de la categoría a la que pertenece (opcional para demo) */
+  categoryId?: string;
+  /** Nombre de la categoría (para modo demo sin categoría existente) */
+  categoryName?: string;
   /** ID de la organización organizadora */
   organizationId: string;
   /** ID del lugar/venue (opcional) */
   venueId?: string;
+  /** Nombre del lugar/venue (para modo demo sin venue existente) */
+  venueName?: string;
   /** UID del organizador (usuario creador) */
   organizerId: string;
   /** URL del banner o imagen principal */

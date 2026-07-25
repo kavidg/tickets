@@ -217,3 +217,269 @@ export async function updateTicketType(
     return handleTicketTypeError(error);
   }
 }
+
+// =============================================================================
+// API REST (NestJS Backend)
+// =============================================================================
+// Las siguientes funciones consumen la API NestJS en lugar de Firestore SDK.
+// Se utilizan desde useTicketTypesByEvent hook.
+// =============================================================================
+
+import auth from '../firebase/auth';
+
+const API_URL: string =
+  import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+
+/**
+ * Tipo de entrada retornado por la API NestJS.
+ */
+export interface TicketTypeFromApi {
+  id: string;
+  eventId: string;
+  organizationId: string;
+  name: string;
+  description?: string;
+  price: number;
+  quantity: number;
+  soldQuantity: number;
+  currency: string;
+  status: 'active' | 'paused' | 'sold_out' | 'closed';
+  salesStartDate?: { _seconds: number; _nanoseconds: number };
+  salesEndDate?: { _seconds: number; _nanoseconds: number };
+  createdAt: { _seconds: number; _nanoseconds: number };
+  updatedAt: { _seconds: number; _nanoseconds: number };
+}
+
+/** Respuesta del servicio con array de tipos de entrada */
+export interface TicketTypesResponse {
+  success: boolean;
+  data?: TicketTypeFromApi[];
+  error?: string;
+}
+
+/** Respuesta del servicio con un tipo de entrada individual */
+export interface TicketTypeResponse {
+  success: boolean;
+  data?: TicketTypeFromApi;
+  error?: string;
+}
+
+/**
+ * Obtiene el token JWT del usuario autenticado.
+ */
+async function getAuthToken(): Promise<string> {
+  const user = auth.currentUser;
+  if (!user) {
+    throw new Error('Debes iniciar sesión para realizar esta operación.');
+  }
+  return user.getIdToken();
+}
+
+/**
+ * Obtiene los tipos de entrada de un evento desde la API.
+ * GET /api/v1/ticket-types/event/:eventId
+ */
+export async function getTicketTypesByEventApi(
+  eventId: string,
+): Promise<TicketTypesResponse> {
+  try {
+    const token = await getAuthToken();
+    const response = await fetch(
+      `${API_URL}/ticket-types/event/${encodeURIComponent(eventId)}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+    if (!response.ok) {
+      if (response.status === 401)
+        return {
+          success: false,
+          error: 'Tu sesión ha expirado. Inicia sesión nuevamente.',
+        };
+      if (response.status === 404) return { success: true, data: [] };
+      const body = await response.json().catch(() => ({}));
+      return {
+        success: false,
+        error:
+          body?.message || body?.error || 'Error al obtener tipos de entrada.',
+      };
+    }
+    const body = await response.json();
+    const rawTypes: TicketTypeFromApi[] = body?.data ?? body ?? [];
+    return {
+      success: true,
+      data: Array.isArray(rawTypes) ? rawTypes : [],
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Error de conexión con el servidor.',
+    };
+  }
+}
+
+/**
+ * Crea un nuevo tipo de entrada desde la API.
+ * POST /api/v1/ticket-types
+ */
+export async function createTicketTypeApi(data: {
+  eventId: string;
+  organizationId: string;
+  name: string;
+  description?: string;
+  price: number;
+  quantity: number;
+  salesStartDate?: string;
+  salesEndDate?: string;
+}): Promise<TicketTypeResponse> {
+  try {
+    const token = await getAuthToken();
+    const response = await fetch(`${API_URL}/ticket-types`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      if (response.status === 401)
+        return {
+          success: false,
+          error: 'Tu sesión ha expirado. Inicia sesión nuevamente.',
+        };
+      const body = await response.json().catch(() => ({}));
+      return {
+        success: false,
+        error:
+          body?.message ||
+          body?.error ||
+          'Error al crear el tipo de entrada.',
+      };
+    }
+    const body = await response.json();
+    const ticketType: TicketTypeFromApi = body?.data ?? body;
+    return ticketType?.id
+      ? { success: true, data: ticketType }
+      : { success: false, error: 'Error al crear el tipo de entrada.' };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Error de conexión con el servidor.',
+    };
+  }
+}
+
+/**
+ * Actualiza un tipo de entrada desde la API.
+ * PATCH /api/v1/ticket-types/:id
+ */
+export async function updateTicketTypeApi(
+  id: string,
+  data: {
+    name?: string;
+    description?: string;
+    price?: number;
+    quantity?: number;
+    status?: string;
+    salesStartDate?: string;
+    salesEndDate?: string;
+  },
+): Promise<TicketTypeResponse> {
+  try {
+    const token = await getAuthToken();
+    const response = await fetch(
+      `${API_URL}/ticket-types/${encodeURIComponent(id)}`,
+      {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      },
+    );
+    if (!response.ok) {
+      if (response.status === 401)
+        return {
+          success: false,
+          error: 'Tu sesión ha expirado. Inicia sesión nuevamente.',
+        };
+      const body = await response.json().catch(() => ({}));
+      return {
+        success: false,
+        error:
+          body?.message ||
+          body?.error ||
+          'Error al actualizar el tipo de entrada.',
+      };
+    }
+    const body = await response.json();
+    return { success: true, data: body?.data ?? body };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Error de conexión con el servidor.',
+    };
+  }
+}
+
+/**
+ * Elimina un tipo de entrada desde la API.
+ * DELETE /api/v1/ticket-types/:id
+ */
+export async function deleteTicketTypeApi(
+  id: string,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const token = await getAuthToken();
+    const response = await fetch(
+      `${API_URL}/ticket-types/${encodeURIComponent(id)}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+    if (!response.ok) {
+      if (response.status === 401)
+        return {
+          success: false,
+          error: 'Tu sesión ha expirado. Inicia sesión nuevamente.',
+        };
+      const body = await response.json().catch(() => ({}));
+      return {
+        success: false,
+        error:
+          body?.message ||
+          body?.error ||
+          'Error al eliminar el tipo de entrada.',
+      };
+    }
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Error de conexión con el servidor.',
+    };
+  }
+}
+

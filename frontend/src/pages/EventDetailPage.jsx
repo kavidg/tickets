@@ -1,8 +1,8 @@
-import { ArrowLeft, Calendar, MapPin, Share2, Users } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { ArrowLeft, Calendar, MapPin, Share2, ShoppingCart, Users } from 'lucide-react';
 import TicketSelector from '../features/tickets/components/TicketSelector';
-import { useEvent } from '../hooks/useEvents';
+import { usePublicEvent } from '../hooks/usePublicEvent';
 import { useCategories } from '../hooks/useCategories';
-import { useTicketTypes } from '../hooks/useTicketTypes';
 import { formatDate, formatPrice } from '../utils/format.js';
 
 // ---------------------------------------------------------------------------
@@ -14,7 +14,13 @@ import { formatDate, formatPrice } from '../utils/format.js';
  */
 function toDateValue(timestamp) {
   if (!timestamp) return new Date().toISOString();
-  return timestamp.toDate ? timestamp.toDate() : timestamp;
+  // Firestore SDK Timestamp con toDate()
+  if (timestamp.toDate) return timestamp.toDate();
+  // API REST: { _seconds, _nanoseconds }
+  if (typeof timestamp._seconds === 'number') {
+    return new Date(timestamp._seconds * 1000);
+  }
+  return timestamp;
 }
 
 // ---------------------------------------------------------------------------
@@ -67,7 +73,7 @@ function ErrorDisplay({ message }) {
       <p className="mt-4 text-red-100/60">{message}</p>
       <a
         className="mt-8 inline-flex items-center gap-2 font-black text-luxe-ember hover:text-red-100"
-        href="#/"
+        href="/"
       >
         <ArrowLeft className="h-4 w-4" /> Volver al inicio
       </a>
@@ -81,38 +87,25 @@ function ErrorDisplay({ message }) {
 
 /**
  * Renderiza la sección de tipos de entrada con sus estados.
- * Conecta useTicketTypes con TicketSelector.
+ * Recibe ticketTypes como prop desde la API pública.
  */
-function TicketSection({ eventDocId }) {
-  const { ticketTypes, loading, error, minPrice } = useTicketTypes(eventDocId);
+function TicketSection({ ticketTypes = [], onSelectionChange }) {
+  // Estado local para la selección y total
+  const [selection, setSelection] = useState([]);
 
-  // Loading de entradas
-  if (loading) {
-    return (
-      <div className="space-y-4">
-        {[1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="animate-pulse rounded-[1.5rem] border border-white/10 bg-white/[0.055] p-5 shadow-2xl shadow-black/25 backdrop-blur-xl"
-          >
-            <div className="h-5 w-24 rounded bg-white/8" />
-            <div className="mt-3 h-4 w-3/4 rounded bg-white/8" />
-            <div className="mt-4 h-9 w-32 rounded-xl bg-white/8" />
-          </div>
-        ))}
-      </div>
-    );
-  }
+  const handleSelectionChange = useCallback(
+    (sel) => {
+      setSelection(sel);
+      onSelectionChange?.(sel);
+    },
+    [onSelectionChange],
+  );
 
-  // Error cargando entradas
-  if (error) {
-    return (
-      <div className="rounded-[1.5rem] border border-dashed border-red-500/30 bg-red-500/8 p-10 text-center shadow-2xl shadow-black/30 backdrop-blur-xl">
-        <p className="text-lg font-black text-red-300">Error al cargar entradas</p>
-        <p className="mt-2 text-red-100/55">{error}</p>
-      </div>
-    );
-  }
+  const totalItems = selection.reduce((sum, s) => sum + s.quantity, 0);
+  const totalAmount = selection.reduce(
+    (sum, s) => sum + s.quantity * s.unitPrice,
+    0,
+  );
 
   // Sin entradas disponibles
   if (ticketTypes.length === 0) {
@@ -130,7 +123,32 @@ function TicketSection({ eventDocId }) {
   }
 
   // Con entradas activas — mostrar selector
-  return <TicketSelector ticketTypes={ticketTypes} />;
+  return (
+    <>
+      <TicketSelector
+        ticketTypes={ticketTypes}
+        onSelectionChange={handleSelectionChange}
+      />
+
+      {/* Botón de compra fijo */}
+      {totalItems > 0 && (
+        <div className="mt-4">
+          <button
+            onClick={() => {
+              window.location.href = '/checkout';
+            }}
+            className="w-full rounded-2xl border border-luxe-ember/45 bg-gradient-to-r from-luxe-crimson to-luxe-ember px-6 py-4 text-base font-black text-white shadow-2xl shadow-luxe-ember/25 transition hover:-translate-y-0.5 hover:from-luxe-wine hover:to-luxe-crimson"
+          >
+            <span className="flex items-center justify-center gap-3">
+              <ShoppingCart className="h-5 w-5" />
+              Comprar {totalItems} {totalItems === 1 ? 'entrada' : 'entradas'} ·{' '}
+              {formatPrice(totalAmount)}
+            </span>
+          </button>
+        </div>
+      )}
+    </>
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -138,25 +156,53 @@ function TicketSection({ eventDocId }) {
 // ---------------------------------------------------------------------------
 
 /**
- * Página de detalle de evento que consume datos desde Firestore
- * via useEvent(slug), useCategories() y useTicketTypes().
+ * Página de detalle de evento que consume datos desde la API pública NestJS.
+ * Reemplaza el acceso directo a Firestore por usePublicEvent().
  */
 export default function EventDetailPage({ eventId }) {
-  const { event: fbEvent, loading, error, notFound } = useEvent(eventId);
+  // =========================================================================
+  // Todos los hooks declarados al inicio, ANTES de cualquier early return
+  // para cumplir con las Rules of Hooks.
+  // =========================================================================
+  const { event: fbEvent, loading, error } = usePublicEvent(eventId);
   const { categoryNameById } = useCategories();
+
+  // Estado para la selección de entradas (siempre declarado)
+  const [ticketSelection, setTicketSelection] = useState([]);
+
+  // Callback para cuando el usuario selecciona entradas (siempre declarado)
+  // fbEvent puede ser null durante la carga — el callback solo se invoca
+  // cuando el evento ya está disponible y TicketSection está renderizado.
+  const handleSelectionChange = useCallback(
+    (sel) => {
+      setTicketSelection(sel);
+      if (!fbEvent) return;
+      // Guardar en sessionStorage para el CheckoutPage
+      sessionStorage.setItem(
+        'checkout_selection',
+        JSON.stringify({
+          eventId: fbEvent.id,
+          slug: fbEvent.slug,
+          organizationId: fbEvent.organizationId,
+          title: fbEvent.title,
+          eventCity: fbEvent.city,
+          items: sel.map((s) => ({
+            ticketTypeId: s.ticketTypeId,
+            quantity: s.quantity,
+          })),
+        }),
+      );
+    },
+    [fbEvent],
+  );
 
   // --- Loading ---
   if (loading) {
     return <LoadingSkeleton />;
   }
 
-  // --- Error inesperado ---
-  if (error) {
-    return <ErrorDisplay message={error} />;
-  }
-
-  // --- No encontrado ---
-  if (notFound || !fbEvent) {
+  // --- Error / No encontrado ---
+  if (error || !fbEvent) {
     return (
       <main className="mx-auto max-w-3xl px-4 py-20 text-center">
         <p className="text-sm font-black uppercase tracking-[0.22em] text-luxe-ember">
@@ -166,19 +212,28 @@ export default function EventDetailPage({ eventId }) {
           Evento no encontrado
         </h1>
         <p className="mt-4 text-red-100/60">
-          El evento pudo cambiar de URL o ya no está disponible.
+          {error || 'El evento pudo cambiar de URL o ya no está disponible.'}
         </p>
         <a
           className="mt-8 inline-flex font-black text-luxe-ember hover:text-red-100"
-          href="#/"
+          href="/"
         >
-          Volver al inicio
+          <ArrowLeft className="h-4 w-4" /> Volver al inicio
         </a>
       </main>
     );
   }
 
   // --- Evento cargado — resolver datos para el template ---
+  const ticketTypesFromApi = fbEvent.ticketTypes || [];
+  const activeTypes = ticketTypesFromApi.filter(
+    (t) => t.status === 'active',
+  );
+  const minPrice =
+    activeTypes.length > 0
+      ? Math.min(...activeTypes.map((t) => t.price))
+      : 0;
+
   const event = {
     id: fbEvent.slug,
     image: fbEvent.imageUrl,
@@ -187,7 +242,7 @@ export default function EventDetailPage({ eventId }) {
     description: fbEvent.description,
     date: toDateValue(fbEvent.startDate),
     location: [fbEvent.city, fbEvent.address].filter(Boolean).join(' · '),
-    price: 0,
+    price: minPrice,
   };
 
   return (
@@ -196,7 +251,7 @@ export default function EventDetailPage({ eventId }) {
       <div className="pointer-events-none absolute right-0 top-40 h-96 w-96 rounded-full bg-luxe-ember/10 blur-3xl" />
       <section className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <a
-          href="#events"
+          href="/events"
           className="inline-flex items-center gap-2 text-sm font-black text-red-100/60 transition hover:text-luxe-ember"
         >
           <ArrowLeft className="h-4 w-4" /> Volver a eventos
@@ -262,7 +317,10 @@ export default function EventDetailPage({ eventId }) {
             destacado para acelerar la conversión sin perder confianza.
           </p>
         </div>
-        <TicketSection eventDocId={fbEvent.id} />
+        <TicketSection
+          ticketTypes={ticketTypesFromApi}
+          onSelectionChange={handleSelectionChange}
+        />
       </section>
     </main>
   );

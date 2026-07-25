@@ -6,19 +6,13 @@
  * No accede directamente a Firebase.
  *
  * Flujo post-login:
- *   1. Verificar si existe perfil en Firestore
- *   2. Si no existe → crearlo
- *   3. Si existe   → actualizar lastLogin
- *   4. Redirigir al Home
+ *   1. Iniciar sesión con Firebase Auth
+ *   2. Redirigir al Home — ProtectedRoute se encarga de verificar o crear el perfil
+ *      (GET /api/v1/profile → si 404 → POST /api/v1/profile)
  */
 
 import { useState, type FormEvent } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import {
-  checkUserProfile,
-  createUserProfile,
-  updateUserLastLogin,
-} from '../services/user.service';
 import Button from '../components/ui/Button';
 
 export default function LoginPage() {
@@ -67,31 +61,9 @@ export default function LoginPage() {
         return;
       }
 
-      const uid = authResponse.user?.uid;
-      const userEmail = authResponse.user?.email;
-
-      if (!uid) {
-        setError('Error al obtener los datos del usuario.');
-        setSubmitting(false);
-        return;
-      }
-
-      // 2. Verificar / crear perfil en Firestore
-      const profileExists = await checkUserProfile(uid);
-
-      if (profileExists) {
-        // Actualizar fecha del último inicio de sesión
-        await updateUserLastLogin(uid);
-      } else {
-        // Crear perfil inicial
-        await createUserProfile({
-          uid,
-          email: userEmail || email,
-        });
-      }
-
-      // 3. Redirigir al Home
-      window.location.hash = '#/';
+      // 2. Redirigir al Home — ProtectedRoute se encarga de verificar
+      //    o crear el perfil y la organización.
+      window.location.href = '/';
     } catch (err) {
       setError('Ocurrió un error inesperado. Intenta de nuevo.');
       setSubmitting(false);
@@ -198,13 +170,13 @@ export default function LoginPage() {
           {/* Enlaces adicionales */}
           <div className="mt-6 flex flex-col items-center gap-3 text-sm">
             <a
-              href="#/register"
+              href="/register"
               className="font-semibold text-red-100/50 transition hover:text-luxe-ember"
             >
               ¿No tienes cuenta? Regístrate
             </a>
             <a
-              href="#/forgot-password"
+              href="/forgot-password"
               className="font-semibold text-red-100/40 transition hover:text-luxe-ember"
             >
               ¿Olvidaste tu contraseña?

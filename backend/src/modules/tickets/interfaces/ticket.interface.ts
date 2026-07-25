@@ -51,3 +51,28 @@ export interface Ticket {
   /** Fecha en que se realizó el check-in (null si no se ha usado) */
   usedAt?: Timestamp;
 }
+
+/**
+ * Ticket enriquecido con datos del evento y tipo de entrada.
+ * Usado en el endpoint público GET /tickets/public?email=.
+ */
+export interface TicketEnriched {
+  /** ID del ticket en Firestore */
+  id: string;
+  /** Código único del ticket */
+  code: string;
+  /** Estado del ticket */
+  status: TicketStatus;
+  /** Nombre del tipo de entrada */
+  ticketTypeName: string;
+  /** ID del evento */
+  eventId: string;
+  /** Título del evento */
+  eventTitle: string;
+  /** Fecha del evento (ISO string) */
+  eventDate: string;
+  /** Nombre del lugar */
+  venueName: string;
+  /** ID de la compra */
+  purchaseId: string;
+}

@@ -29,7 +29,7 @@ import { COLLECTIONS } from '../../constants/collections';
 import { FirestoreRepository } from '../../common/firestore/firestore.repository';
 import { Timestamps } from '../../common/utils/timestamps';
 import { TicketCode } from '../../common/utils/ticket-code';
-import type { Ticket } from './interfaces/ticket.interface';
+import type { Ticket, TicketEnriched } from './interfaces/ticket.interface';
 import type { CurrentUser } from '../auth/interfaces/current-user.interface';
 import type { Purchase } from '../purchases/interfaces/purchase.interface';
 
@@ -104,6 +104,106 @@ export class TicketsService extends FirestoreRepository<Ticket> {
     );
 
     return tickets;
+  }
+
+  /**
+   * Busca tickets públicos asociados a un correo electrónico.
+   *
+   * Para cada ticket, enriquece los datos con información del evento
+   * y del tipo de entrada.
+   *
+   * Endpoint público — no requiere autenticación.
+   *
+   * @param email - Correo electrónico del comprador.
+   * @returns Lista de tickets enriquecidos con datos del evento y ticket type.
+   */
+  async findTicketsByEmail(email: string): Promise<TicketEnriched[]> {
+    // 1. Buscar purchases por buyerEmail
+    const purchasesSnapshot = await this.firebase.db
+      .collection(COLLECTIONS.PURCHASES)
+      .where('buyerEmail', '==', email)
+      .get();
+
+    if (purchasesSnapshot.empty) {
+      return [];
+    }
+
+    // 2. Obtener todas las purchaseIds
+    const purchaseIds = purchasesSnapshot.docs.map((doc) => doc.id);
+
+    // 3. Buscar tickets por purchaseId
+    const allTickets: Ticket[] = [];
+    for (const purchaseId of purchaseIds) {
+      const ticketsSnap = await this.firebase.db
+        .collection(COLLECTIONS.TICKETS)
+        .where('purchaseId', '==', purchaseId)
+        .get();
+
+      ticketsSnap.forEach((doc) => {
+        allTickets.push({ id: doc.id, ...doc.data() } as Ticket);
+      });
+    }
+
+    if (allTickets.length === 0) {
+      return [];
+    }
+
+    // 4. Enriquecer con datos de eventos y ticket types
+    const enrichedTickets: TicketEnriched[] = [];
+
+    for (const ticket of allTickets) {
+      // Obtener evento
+      let eventTitle = 'Evento';
+      let eventDate = '';
+      let venueName = '';
+      try {
+        const eventSnap = await this.firebase.db
+          .collection(COLLECTIONS.EVENTS)
+          .doc(ticket.eventId)
+          .get();
+        if (eventSnap.exists) {
+          const evData = eventSnap.data()!;
+          eventTitle = (evData.title as string) || 'Evento';
+          const rawDate = evData.startDate;
+          if (rawDate && typeof (rawDate as any).toDate === 'function') {
+            eventDate = (rawDate as any).toDate().toISOString();
+          } else if (rawDate) {
+            eventDate = String(rawDate);
+          }
+          venueName = (evData.venueName as string) || (evData.city as string) || '';
+        }
+      } catch {
+        // Usar valores por defecto
+      }
+
+      // Obtener nombre del ticket type
+      let ticketTypeName = 'Entrada';
+      try {
+        const ttSnap = await this.firebase.db
+          .collection(COLLECTIONS.TICKET_TYPES)
+          .doc(ticket.ticketTypeId)
+          .get();
+        if (ttSnap.exists) {
+          ticketTypeName = (ttSnap.data()!.name as string) || 'Entrada';
+        }
+      } catch {
+        // Usar valor por defecto
+      }
+
+      enrichedTickets.push({
+        id: ticket.id,
+        code: ticket.code,
+        status: ticket.status,
+        ticketTypeName,
+        eventId: ticket.eventId,
+        eventTitle,
+        eventDate,
+        venueName,
+        purchaseId: ticket.purchaseId,
+      });
+    }
+
+    return enrichedTickets;
   }
 
   /**

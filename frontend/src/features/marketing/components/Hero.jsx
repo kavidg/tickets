@@ -23,10 +23,10 @@ export default function Hero() {
             Una tiquetera moderna para descubrir conciertos y experiencias premium con compra rápida, entradas claras y beneficios exclusivos.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button href="#events" variant="glow" className="gap-2">
+            <Button href="/events" variant="glow" className="gap-2">
               Explorar eventos <ArrowRight className="h-4 w-4" />
             </Button>
-            <Button href="#how-it-works" variant="secondary">Ver beneficios</Button>
+            <Button href="/how-it-works" variant="secondary">Ver beneficios</Button>
           </div>
           <div className="mt-8 grid gap-3 text-sm font-semibold text-red-100/60 sm:grid-cols-3">
             <span className="flex items-center gap-2"><Ticket className="h-4 w-4 text-luxe-ember" /> Tickets instantáneos</span>

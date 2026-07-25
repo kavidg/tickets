@@ -17,7 +17,7 @@ import { ValidateTicketDto } from './dto/validate-ticket.dto';
 import type { CurrentUser as CurrentUserInterface } from '../auth/interfaces/current-user.interface';
 import type { CheckInResponse, EventCheckInLog } from './check-in.service';
 
-@Controller('api/v1/check-in')
+@Controller('check-in')
 @UseGuards(FirebaseAuthGuard)
 export class CheckInController {
   constructor(private readonly checkInService: CheckInService) {}

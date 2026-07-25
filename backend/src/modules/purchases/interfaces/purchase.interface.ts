@@ -59,8 +59,14 @@ export interface PurchaseItem {
 export interface Purchase {
   /** ID único del documento en Firestore */
   id: string;
-  /** UID del comprador (usuario autenticado que realiza la compra) */
+  /** UID del comprador (vacio para compras públicas, filled para autenticadas) */
   userId: string;
+  /** Nombre del comprador (compras públicas sin autenticación) */
+  buyerName?: string;
+  /** Email del comprador (compras públicas sin autenticación) */
+  buyerEmail?: string;
+  /** Teléfono del comprador (compras públicas sin autenticación) */
+  buyerPhone?: string;
   /** ID de la organización propietaria del evento */
   organizationId: string;
   /** ID del evento comprado */

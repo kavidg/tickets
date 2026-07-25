@@ -2,14 +2,16 @@
  * TicketS - VenuesController
  *
  * Controlador del módulo de venues (lugares de evento).
- * Todos los endpoints requieren autenticación mediante FirebaseAuthGuard.
  *
  * Endpoints:
- *   POST   /venues     → Crear un nuevo venue
- *   GET    /venues/my  → Listar venues del usuario autenticado
- *   GET    /venues/:id → Obtener un venue por ID
- *   PATCH  /venues/:id → Actualizar un venue
- *   DELETE /venues/:id → Eliminar un venue
+ *   GET  /venues/public  → Público, venues activos (sin auth)
+ *   GET  /venues         → Auth, venues activos de la organización
+ *   GET  /venues/all     → Auth, todos los venues de la organización
+ *   GET  /venues/my      → Auth, todos los venues de la organización (alias)
+ *   GET  /venues/:id     → Público, venue por ID
+ *   POST /venues         → Auth, crear venue (orgId del perfil)
+ *   PATCH /venues/:id    → Auth, actualizar (valida ownership)
+ *   DELETE /venues/:id   → Auth, eliminar (valida ownership)
  *
  * @see FirebaseAuthGuard para la validación del token.
  * @see CurrentUser decorator para acceder al usuario autenticado.
@@ -35,27 +37,82 @@ import { UpdateVenueDto } from './dto/update-venue.dto';
 import type { CurrentUser as CurrentUserType } from '../auth/interfaces/current-user.interface';
 
 @Controller('venues')
-@UseGuards(FirebaseAuthGuard)
 export class VenuesController {
   constructor(private readonly venuesService: VenuesService) {}
 
   /**
+   * GET /api/v1/venues/public
+   *
+   * Lista todos los venues activos sin filtro de organización.
+   * Endpoint público — no requiere autenticación.
+   */
+  @Get('public')
+  async findAllPublic() {
+    return this.venuesService.getPublicVenues();
+  }
+
+  /**
+   * GET /api/v1/venues
+   *
+   * Lista los venues activos de la organización del usuario autenticado.
+   */
+  @Get()
+  @UseGuards(FirebaseAuthGuard)
+  async findAll(@CurrentUser() user: CurrentUserType) {
+    const orgId = user.organizationId;
+    if (!orgId) {
+      console.log('[VenuesController.findAll] No organizationId for user', user.uid, '— returning empty');
+      return [];
+    }
+    return this.venuesService.getActiveVenues(orgId);
+  }
+
+  /**
+   * GET /api/v1/venues/all
+   *
+   * Lista todos los venues (activos e inactivos) de la organización.
+   */
+  @Get('all')
+  @UseGuards(FirebaseAuthGuard)
+  async findAllAdmin(@CurrentUser() user: CurrentUserType) {
+    const orgId = user.organizationId;
+    if (!orgId) {
+      console.log('[VenuesController.findAllAdmin] No organizationId for user', user.uid, '— returning empty');
+      return [];
+    }
+    return this.venuesService.getAllVenues(orgId);
+  }
+
+  /**
+   * GET /api/v1/venues/my
+   *
+   * Alias de /venues/all — retorna todos los venues de la organización.
+   */
+  @Get('my')
+  @UseGuards(FirebaseAuthGuard)
+  async getMyVenues(@CurrentUser() user: CurrentUserType) {
+    return this.venuesService.getMyVenues(user);
+  }
+
+  /**
+   * GET /api/v1/venues/:id
+   *
+   * Retorna un venue por su ID.
+   * Endpoint público.
+   */
+  @Get(':id')
+  async getVenueById(@Param('id') id: string) {
+    return this.venuesService.getVenueById(id);
+  }
+
+  /**
    * POST /api/v1/venues
    *
-   * Crea un nuevo venue/lugar de evento.
-   * Solo se permiten venues de organizaciones donde el usuario sea owner.
-   *
-   * Validaciones:
-   *   - name: requerido, mínimo 3 caracteres
-   *   - city: requerido
-   *   - capacity: número positivo
-   *   - organizationId: debe existir y el usuario debe ser owner
-   *
-   * @param dto - Datos del venue validados.
-   * @param user - Usuario autenticado.
-   * @returns El venue creado.
+   * Crea un nuevo venue.
+   * La organización se asigna automáticamente desde el perfil del usuario.
    */
   @Post()
+  @UseGuards(FirebaseAuthGuard)
   async create(
     @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
     dto: CreateVenueDto,
@@ -65,44 +122,13 @@ export class VenuesController {
   }
 
   /**
-   * GET /api/v1/venues/my
-   *
-   * Retorna los venues del usuario autenticado.
-   * Busca venues que pertenezcan a organizaciones donde el usuario es owner.
-   *
-   * @param user - Usuario autenticado.
-   * @returns Lista de venues del usuario.
-   */
-  @Get('my')
-  async getMyVenues(@CurrentUser() user: CurrentUserType) {
-    return this.venuesService.getMyVenues(user);
-  }
-
-  /**
-   * GET /api/v1/venues/:id
-   *
-   * Retorna un venue por su ID de Firestore.
-   *
-   * @param id - ID del documento en Firestore.
-   * @returns El venue encontrado.
-   */
-  @Get(':id')
-  async getVenueById(@Param('id') id: string) {
-    return this.venuesService.getVenueById(id);
-  }
-
-  /**
    * PATCH /api/v1/venues/:id
    *
    * Actualiza un venue existente.
-   * Solo el owner de la organización del venue puede actualizarlo.
-   *
-   * @param id - ID del venue a actualizar.
-   * @param dto - Datos a actualizar validados.
-   * @param user - Usuario autenticado.
-   * @returns El venue actualizado.
+   * Valida ownership de la organización.
    */
   @Patch(':id')
+  @UseGuards(FirebaseAuthGuard)
   async update(
     @Param('id') id: string,
     @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
@@ -116,12 +142,10 @@ export class VenuesController {
    * DELETE /api/v1/venues/:id
    *
    * Elimina un venue.
-   * Solo el owner de la organización del venue puede eliminarlo.
-   *
-   * @param id - ID del venue a eliminar.
-   * @param user - Usuario autenticado.
+   * Valida ownership de la organización.
    */
   @Delete(':id')
+  @UseGuards(FirebaseAuthGuard)
   async delete(
     @Param('id') id: string,
     @CurrentUser() user: CurrentUserType,

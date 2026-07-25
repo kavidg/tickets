@@ -25,8 +25,16 @@ export interface Venue {
   address: string;
   /** Ciudad donde se ubica */
   city: string;
+  /** Departamento / Estado / Provincia */
+  state: string;
   /** País donde se ubica */
   country: string;
+  /** Código postal */
+  postalCode: string;
+  /** Latitud (coordenada) */
+  latitude: number;
+  /** Longitud (coordenada) */
+  longitude: number;
   /** Capacidad máxima de personas */
   capacity: number;
   /** URL de la imagen representativa del lugar */

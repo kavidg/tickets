@@ -29,6 +29,8 @@ import { COLLECTIONS } from '../../constants/collections';
 import { Timestamps } from '../../common/utils/timestamps';
 import { InventoryService } from '../inventory/inventory.service';
 import { TicketsService } from '../tickets/tickets.service';
+import { EmailService } from '../email/email.service';
+import type { TicketEmailData } from '../email/email.service';
 import type { PaymentWebhookEvent } from './interfaces/payment-webhook.interface';
 import type { InventoryReservationItem } from '../inventory/interfaces/inventory-reservation.interface';
 import type { Purchase } from '../purchases/interfaces/purchase.interface';
@@ -41,6 +43,7 @@ export class WebhookService {
     private readonly firebase: FirebaseAdminService,
     private readonly inventoryService: InventoryService,
     private readonly ticketsService: TicketsService,
+    private readonly emailService: EmailService,
   ) {}
 
   /**
@@ -53,16 +56,16 @@ export class WebhookService {
   async processPaymentEvent(event: PaymentWebhookEvent): Promise<void> {
     const { paymentReference, status, transactionId } = event;
 
-    // 1. Buscar Purchase por paymentReference
+    // 1. Buscar Purchase por checkoutReference (enviado a Bold como data-order-id)
     const purchaseSnapshot = await this.firebase.db
       .collection(COLLECTIONS.PURCHASES)
-      .where('paymentReference', '==', paymentReference)
+      .where('checkoutReference', '==', paymentReference)
       .limit(1)
       .get();
 
     if (purchaseSnapshot.empty) {
       throw new NotFoundException(
-        `Compra con paymentReference "${paymentReference}" no encontrada.`,
+        `Compra con checkoutReference "${paymentReference}" no encontrada.`,
       );
     }
 
@@ -164,6 +167,9 @@ export class WebhookService {
       this.logger.log(
         `Tickets generated for purchase ${purchase.id}: ${tickets.length} tickets`,
       );
+
+      // Enviar correo con las entradas al comprador
+      await this.sendPurchaseEmail(purchase, tickets);
     } catch (ticketError) {
       // Error generando tickets — no bloquear el flujo de pago
       // Los tickets podrán regenerarse manualmente
@@ -171,6 +177,88 @@ export class WebhookService {
         `Error generating tickets for purchase ${purchase.id}: ${(ticketError as Error).message}`,
       );
     }
+  }
+
+  /**
+   * Envía un correo al comprador con las entradas generadas.
+   * No interrumpe el flujo si falla — solo registra el error.
+   */
+  private async sendPurchaseEmail(
+    purchase: Purchase,
+    tickets: Array<{ id: string; code: string; ticketTypeId: string }>,
+  ): Promise<void> {
+    const buyerName = purchase.buyerName || purchase.buyerEmail || 'Comprador';
+    const buyerEmail = purchase.buyerEmail;
+
+    if (!buyerEmail) {
+      this.logger.warn(`No buyer email for purchase ${purchase.id}. Skipping email.`);
+      return;
+    }
+
+    // Obtener nombres de ticket types desde Firestore
+    const ticketTypeNames = new Map<string, string>();
+    for (const item of purchase.items) {
+      try {
+        const ttSnap = await this.firebase.db
+          .collection(COLLECTIONS.TICKET_TYPES)
+          .doc(item.ticketTypeId)
+          .get();
+        if (ttSnap.exists) {
+          const ttData = ttSnap.data();
+          ticketTypeNames.set(item.ticketTypeId, (ttData?.name as string) || item.ticketName);
+        } else {
+          ticketTypeNames.set(item.ticketTypeId, item.ticketName);
+        }
+      } catch {
+        ticketTypeNames.set(item.ticketTypeId, item.ticketName);
+      }
+    }
+
+    // Obtener datos del evento
+    let eventTitle = 'Evento';
+    let eventDate = '';
+    let venueName = '';
+    try {
+      const eventSnap = await this.firebase.db
+        .collection(COLLECTIONS.EVENTS)
+        .doc(purchase.eventId)
+        .get();
+      if (eventSnap.exists) {
+        const eventData = eventSnap.data()!;
+        eventTitle = (eventData.title as string) || 'Evento';
+        // startDate puede ser Timestamp de Firestore o string ISO
+        const rawDate = eventData.startDate;
+        if (rawDate && typeof (rawDate as any).toDate === 'function') {
+          eventDate = (rawDate as any).toDate().toLocaleDateString('es-CO', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          });
+        } else if (rawDate) {
+          eventDate = String(rawDate);
+        }
+        venueName = (eventData.venueName as string) || (eventData.city as string) || '';
+      }
+    } catch {
+      // Usar valores por defecto
+    }
+
+    const emailData: TicketEmailData = {
+      buyerName,
+      buyerEmail,
+      eventTitle,
+      eventDate,
+      venueName,
+      tickets: tickets.map((t) => ({
+        code: t.code,
+        ticketTypeName: ticketTypeNames.get(t.ticketTypeId) || 'Entrada',
+      })),
+    };
+
+    await this.emailService.sendTicketsEmail(emailData);
   }
 
   /**

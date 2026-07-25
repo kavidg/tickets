@@ -31,10 +31,28 @@ export class EventsService extends FirestoreRepository<Event> {
 
   /**
    * Crea un nuevo evento en Firestore.
+   * Valida que la categoría y el venue pertenezcan a la organización del usuario.
    */
   async create(dto: CreateEventDto, user: CurrentUser): Promise<Event> {
+    const organizationId = user.organizationId;
+
+    if (!organizationId) {
+      throw new BadRequestException(
+        'No tienes una organización asignada. Crea o únete a una organización primero.',
+      );
+    }
+
     await this.ensureUnique('slug', dto.slug);
-    await this.validateOrganizationOwnership(dto.organizationId, user.uid);
+
+    // Validar que la categoría (si se proporciona) pertenezca a la organización
+    if (dto.categoryId) {
+      await this.validateCategoryOwnership(dto.categoryId, organizationId);
+    }
+
+    // Validar que el venue (si se proporciona) pertenezca a la organización
+    if (dto.venueId) {
+      await this.validateVenueOwnership(dto.venueId, organizationId);
+    }
 
     const startDate = new Date(dto.startDate);
     const endDate = new Date(dto.endDate);
@@ -50,9 +68,11 @@ export class EventsService extends FirestoreRepository<Event> {
         title: dto.title,
         slug: dto.slug,
         description: dto.description || '',
-        categoryId: dto.categoryId,
-        organizationId: dto.organizationId,
-        venueId: dto.venueId || '',
+        categoryId: dto.categoryId || null,
+        categoryName: dto.categoryName || null,
+        organizationId,
+        venueId: dto.venueId || null,
+        venueName: dto.venueName || null,
         organizerId: user.uid,
         imageUrl: dto.imageUrl || '',
         city: dto.city,
@@ -65,7 +85,7 @@ export class EventsService extends FirestoreRepository<Event> {
 
       const event = await this.createDoc(eventData);
 
-      this.logger.log(`Event created: ${event.id} (slug: ${dto.slug})`);
+      this.logger.log(`Event created: ${event.id} (org: ${organizationId}, slug: ${dto.slug})`);
 
       return event;
     } catch (error) {
@@ -132,12 +152,14 @@ export class EventsService extends FirestoreRepository<Event> {
       await this.ensureUnique('slug', dto.slug);
     }
 
-    // Validar organización y ownership (si se está cambiando)
-    if (
-      dto.organizationId &&
-      dto.organizationId !== existingEvent.organizationId
-    ) {
-      await this.validateOrganizationOwnership(dto.organizationId, user.uid);
+    // Validar categoría (si se está cambiando y es un ID real)
+    if (dto.categoryId && dto.categoryId !== existingEvent.categoryId) {
+      await this.validateCategoryOwnership(dto.categoryId, existingEvent.organizationId);
+    }
+
+    // Validar venue (si se está cambiando y es un ID real)
+    if (dto.venueId && dto.venueId !== existingEvent.venueId) {
+      await this.validateVenueOwnership(dto.venueId, existingEvent.organizationId);
     }
 
     // Validar fechas
@@ -161,8 +183,9 @@ export class EventsService extends FirestoreRepository<Event> {
       if (dto.slug !== undefined) updateData.slug = dto.slug;
       if (dto.description !== undefined) updateData.description = dto.description;
       if (dto.categoryId !== undefined) updateData.categoryId = dto.categoryId;
-      if (dto.organizationId !== undefined) updateData.organizationId = dto.organizationId;
+      if (dto.categoryName !== undefined) updateData.categoryName = dto.categoryName;
       if (dto.venueId !== undefined) updateData.venueId = dto.venueId;
+      if (dto.venueName !== undefined) updateData.venueName = dto.venueName;
       if (dto.imageUrl !== undefined) updateData.imageUrl = dto.imageUrl;
       if (dto.city !== undefined) updateData.city = dto.city;
       if (dto.address !== undefined) updateData.address = dto.address;
@@ -220,26 +243,162 @@ export class EventsService extends FirestoreRepository<Event> {
     }
   }
 
+  /**
+   * Obtiene todos los eventos públicos (published).
+   * Usa Firebase Admin SDK — sin restricciones de reglas Firestore.
+   * Endpoint público — NO requiere autenticación.
+   *
+   * @returns Lista de eventos publicados ordenados por startDate ascendente.
+   */
+  async getPublicEvents(): Promise<Record<string, unknown>[]> {
+    try {
+      const docs = await this.findRawInCollection(
+        COLLECTIONS.EVENTS,
+        (col) =>
+          col
+            .where('status', '==', 'published')
+            .orderBy('startDate', 'asc'),
+      );
+
+      this.logger.log(`Public events listed: ${docs.length} events`);
+
+      return docs;
+    } catch (error) {
+      this.logger.error(
+        `Error fetching public events: ${(error as Error).message}`,
+      );
+      throw new BadRequestException(
+        'Error al obtener los eventos. Intenta nuevamente.',
+      );
+    }
+  }
+
+  /**
+   * Obtiene un evento público por su slug.
+   * Solo retorna eventos con status 'published'.
+   * Incluye los tipos de entrada (ticket types) asociados.
+   *
+   * Este método es público — NO requiere autenticación.
+   *
+   * @param slug - Slug único del evento.
+   * @returns Evento con ticketTypes incluidos.
+   *
+   * @throws NotFoundException si el evento no existe o no está publicado.
+   */
+  async getPublicEventBySlug(slug: string): Promise<Record<string, unknown>> {
+    try {
+      const events = await this.findMany((col) =>
+        col
+          .where('slug', '==', slug)
+          .where('status', '==', 'published')
+          .limit(1),
+      );
+
+      if (events.length === 0) {
+        throw new NotFoundException(
+          'El evento no existe o no está disponible.',
+        );
+      }
+
+      const event = events[0];
+
+      // Obtener tipos de entrada asociados al evento
+      const ticketTypeDocs = await this.findRawInCollection(
+        COLLECTIONS.TICKET_TYPES,
+        (col) => col.where('eventId', '==', event.id),
+      );
+
+      // Mapear tipos de entrada con campo available calculado
+      const ticketTypes = ticketTypeDocs.map((tt) => ({
+        id: tt.id,
+        eventId: tt.eventId,
+        name: tt.name,
+        description: tt.description || '',
+        price: tt.price,
+        quantity: tt.quantity,
+        soldQuantity: tt.soldQuantity || 0,
+        currency: tt.currency || 'COP',
+        status: tt.status || 'active',
+        available: (tt.quantity as number) - ((tt.soldQuantity as number) || 0),
+      }));
+
+      this.logger.log(`Public event accessed: ${event.id} (slug: ${slug})`);
+
+      return {
+        id: event.id,
+        title: event.title,
+        slug: event.slug,
+        description: event.description,
+        imageUrl: event.imageUrl,
+        city: event.city,
+        address: event.address,
+        startDate: event.startDate,
+        endDate: event.endDate,
+        categoryId: event.categoryId,
+        organizationId: event.organizationId,
+        organizerId: event.organizerId,
+        ticketTypes,
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
+      this.logger.error(
+        `Error fetching public event by slug ${slug}: ${(error as Error).message}`,
+      );
+      throw new BadRequestException(
+        'Error al obtener el evento. Intenta nuevamente.',
+      );
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Helpers privados
   // ---------------------------------------------------------------------------
 
-  private async validateOrganizationOwnership(
+  /**
+   * Valida que una categoría pertenezca a la organización especificada.
+   */
+  private async validateCategoryOwnership(
+    categoryId: string,
     organizationId: string,
-    userId: string,
   ): Promise<void> {
-    const orgData = await this.getRawDoc(
-      COLLECTIONS.ORGANIZATIONS,
-      organizationId,
+    const categoryData = await this.getRawDoc(
+      COLLECTIONS.CATEGORIES,
+      categoryId,
     );
 
-    if (!orgData) {
-      throw new NotFoundException('La organización no existe.');
+    if (!categoryData) {
+      throw new NotFoundException('La categoría no existe.');
     }
 
-    if (orgData.ownerId !== userId) {
+    if (categoryData.organizationId !== organizationId) {
       throw new ForbiddenException(
-        'No eres el propietario de esta organización.',
+        'La categoría no pertenece a tu organización.',
+      );
+    }
+  }
+
+  /**
+   * Valida que un venue pertenezca a la organización especificada.
+   */
+  private async validateVenueOwnership(
+    venueId: string,
+    organizationId: string,
+  ): Promise<void> {
+    const venueData = await this.getRawDoc(
+      COLLECTIONS.VENUES,
+      venueId,
+    );
+
+    if (!venueData) {
+      throw new NotFoundException('El lugar no existe.');
+    }
+
+    if (venueData.organizationId !== organizationId) {
+      throw new ForbiddenException(
+        'El lugar no pertenece a tu organización.',
       );
     }
   }

@@ -49,23 +49,38 @@ export class CreateEventDto {
   description?: string;
 
   /**
-   * ID de la categoría (requerido).
+   * ID de la categoría (opcional para demo).
+   * Si se proporciona, se valida que pertenezca a la organización.
    */
-  @IsString({ message: 'La categoría es requerida.' })
-  categoryId!: string;
+  @IsOptional()
+  @IsString({ message: 'La categoría debe ser un texto válido.' })
+  categoryId?: string;
 
   /**
-   * ID de la organización organizadora (requerido).
+   * Nombre de la categoría para modo demo (opcional).
+   * Se usa cuando no se selecciona una categoría existente.
    */
-  @IsString({ message: 'La organización es requerida.' })
-  organizationId!: string;
+  @IsOptional()
+  @IsString({ message: 'El nombre de la categoría debe ser un texto válido.' })
+  @MinLength(2, { message: 'El nombre de la categoría debe tener al menos 2 caracteres.' })
+  categoryName?: string;
 
   /**
-   * ID del lugar/venue (opcional).
+   * ID del lugar/venue (opcional para demo).
+   * Si se proporciona, se valida que pertenezca a la organización.
    */
   @IsOptional()
   @IsString({ message: 'El lugar debe ser un texto válido.' })
   venueId?: string;
+
+  /**
+   * Nombre del lugar/venue para modo demo (opcional).
+   * Se usa cuando no se selecciona un venue existente.
+   */
+  @IsOptional()
+  @IsString({ message: 'El nombre del lugar debe ser un texto válido.' })
+  @MinLength(2, { message: 'El nombre del lugar debe tener al menos 2 caracteres.' })
+  venueName?: string;
 
   /**
    * URL del banner o imagen principal (opcional).

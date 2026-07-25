@@ -7,19 +7,31 @@
  * Flujo:
  *   1. Mientras se valida la sesión inicial → muestra indicador de carga.
  *   2. Si no hay sesión activa → redirige a la pantalla de login.
- *   3. Si hay sesión activa → renderiza los componentes hijos.
+ *   3. Si hay sesión activa →
+ *      a. GET /api/v1/profile → si 404, POST /api/v1/profile
+ *      b. GET /api/v1/profile/organization → si existe, ready; si no, needs_setup
+ *   4. Renderiza los componentes hijos.
+ *
+ * El perfil se consulta primero. Solo si responde 404 se crea.
+ * Nunca se intenta crear un perfil que ya existe.
+ * No hay retries ni timeouts de seguridad.
  *
  * Uso:
  *   <ProtectedRoute>
  *     <Dashboard />
  *   </ProtectedRoute>
- *
- * Preparado para soportar validación por roles en el futuro
- * mediante la prop opcional `allowedRoles`.
  */
 
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useState, useRef, type ReactNode } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import auth from '../firebase/auth';
+
+// ---------------------------------------------------------------------------
+// Constantes
+// ---------------------------------------------------------------------------
+
+const API_URL: string =
+  import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
 
 // ---------------------------------------------------------------------------
 // Tipos
@@ -30,18 +42,11 @@ export interface ProtectedRouteProps {
   children: ReactNode;
   /**
    * Lista de roles permitidos (futuro).
-   * Cuando se implemente el sistema de roles, si se especifica,
-   * solo los usuarios con uno de estos roles podrán acceder.
-   *
-   * @example
-   * <ProtectedRoute allowedRoles={['admin', 'organizer']}>
-   *   <AdminPanel />
-   * </ProtectedRoute>
    */
   allowedRoles?: string[];
   /**
    * Ruta a la que redirigir si el usuario no está autenticado.
-   * @default '#/login'
+   * @default '/login'
    */
   redirectTo?: string;
 }
@@ -50,52 +55,127 @@ export interface ProtectedRouteProps {
 // Componente
 // ---------------------------------------------------------------------------
 
-/**
- * Componente que protege rutas privadas verificando autenticación.
- *
- * @example
- * // Protección básica
- * <ProtectedRoute>
- *   <MiPerfil />
- * </ProtectedRoute>
- *
- * @example
- * // Con redirección personalizada
- * <ProtectedRoute redirectTo="#/acceso-restringido">
- *   <Configuracion />
- * </ProtectedRoute>
- */
 export default function ProtectedRoute({
   children,
   allowedRoles,
-  redirectTo = '#/login',
+  redirectTo = '/login',
 }: ProtectedRouteProps) {
   const { loading, authenticated } = useAuth();
+
+  // Estado del onboarding: 'idle' | 'checking' | 'needs_setup' | 'ready'
+  const [onboardingStatus, setOnboardingStatus] = useState<
+    'idle' | 'checking' | 'needs_setup' | 'ready'
+  >('idle');
+  const checkedRef = useRef(false);
 
   // -----------------------------------------------------------------------
   // Redirección si no está autenticado
   // -----------------------------------------------------------------------
   useEffect(() => {
     if (!loading && !authenticated) {
-      window.location.hash = redirectTo;
+      window.location.href = redirectTo;
     }
   }, [loading, authenticated, redirectTo]);
 
   // -----------------------------------------------------------------------
-  // 1. Estado de carga: mostramos un spinner mientras se valida la sesión
+  // Verificar perfil y organización (una sola vez por sesión)
   // -----------------------------------------------------------------------
-  if (loading) {
+  // -----------------------------------------------------------------------
+  // Verificar perfil y organización (una sola vez por sesión)
+  // -----------------------------------------------------------------------
+  // Nota: NO se usa la bandera `cancelled` para evitar que el componente
+  // quede atascado en 'checking' si el efecto se re-ejecuta mientras
+  // checkOnboarding() está en medio de una operación asíncrona.
+  // React maneja correctamente los setState en componentes desmontados.
+  useEffect(() => {
+    if (!authenticated || checkedRef.current) return;
+    checkedRef.current = true;
+
+    async function checkOnboarding() {
+      console.log('[ProtectedRoute] START');
+      setOnboardingStatus('checking');
+
+      try {
+        // auth.currentUser ya está disponible porque authenticated === true
+        const user = auth.currentUser;
+        if (!user) {
+          console.log('[ProtectedRoute] No currentUser — forcing ready');
+          setOnboardingStatus('ready');
+          return;
+        }
+
+        const token = await user.getIdToken();
+        const headers: Record<string, string> = {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        };
+
+        // 1. Verificar perfil en el backend
+        console.log('[ProtectedRoute] GET PROFILE');
+        const profileRes = await fetch(`${API_URL}/profile`, { headers });
+        console.log('[ProtectedRoute] PROFILE RESPONSE:', profileRes.status);
+
+        if (profileRes.status === 404) {
+          // Perfil no existe → crearlo automáticamente
+          console.log('[ProtectedRoute] Profile 404 — creating');
+          await fetch(`${API_URL}/profile`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+              displayName: user.displayName || user.email?.split('@')[0] || '',
+            }),
+          });
+          console.log('[ProtectedRoute] Profile created');
+        } else if (!profileRes.ok) {
+          // Error inesperado de API — permitir acceso igual
+          console.log('[ProtectedRoute] Profile error — forcing ready');
+          setOnboardingStatus('ready');
+          return;
+        }
+
+        // 2. Verificar organización
+        console.log('[ProtectedRoute] CHECK ORGANIZATION');
+        const orgRes = await fetch(`${API_URL}/profile/organization`, { headers });
+        console.log('[ProtectedRoute] ORGANIZATION RESPONSE:', orgRes.status);
+
+        if (orgRes.ok) {
+          const orgBody = await orgRes.json();
+          console.log('[ProtectedRoute] ORG BODY:', JSON.stringify(orgBody));
+          if (orgBody?.data?.id) {
+            console.log('[ProtectedRoute] SETTING READY — organization found');
+            setOnboardingStatus('ready');
+            return;
+          }
+        }
+
+        // Sin organización → necesita setup
+        console.log('[ProtectedRoute] SETTING STATUS: needs_setup');
+        setOnboardingStatus('needs_setup');
+      } catch (err) {
+        console.log('[ProtectedRoute] ERROR — forcing ready:', err);
+        setOnboardingStatus('ready');
+      }
+    }
+
+    checkOnboarding();
+  }, [authenticated]);
+
+  // -----------------------------------------------------------------------
+  // 1. Estado de carga: mientras AuthContext valida o verificamos onboarding
+  // -----------------------------------------------------------------------
+  if (loading || onboardingStatus === 'checking') {
     return (
       <main className="flex min-h-[70vh] items-center justify-center px-4">
         <div className="text-center">
-          {/* Spinner animado */}
           <div
             className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-luxe-ember/30 border-t-luxe-ember"
             role="status"
             aria-label="Verificando sesión"
           />
           <p className="mt-4 text-sm font-semibold text-red-100/50">
-            Verificando sesión…
+            {onboardingStatus === 'checking'
+              ? 'Verificando tu organización…'
+              : 'Verificando sesión…'}
           </p>
         </div>
       </main>
@@ -110,22 +190,25 @@ export default function ProtectedRoute({
   }
 
   // -----------------------------------------------------------------------
-  // 3. Validación de roles (futuro)
+  // 3. Necesita setup: redirigir al onboarding o renderizar setup page
   // -----------------------------------------------------------------------
-  if (allowedRoles && allowedRoles.length > 0) {
-    // TODO: Implementar validación de roles cuando el sistema de roles esté listo.
-    // El AuthUser deberá incluir un campo `role` que se comparará con allowedRoles.
-    // Ejemplo:
-    //   if (!user.role || !allowedRoles.includes(user.role)) {
-    //     window.location.hash = '#/unauthorized';
-    //     return null;
-    //   }
-    //
-    // Por ahora, los roles no están implementados, así que permitimos el acceso.
+  if (onboardingStatus === 'needs_setup') {
+    if (window.location.pathname === '/organization/setup') {
+      return <>{children}</>;
+    }
+    window.location.href = '/organization/setup';
+    return null;
   }
 
   // -----------------------------------------------------------------------
-  // 4. Autenticado (y con rol válido en el futuro): renderizar contenido
+  // 4. Validación de roles (futuro)
+  // -----------------------------------------------------------------------
+  if (allowedRoles && allowedRoles.length > 0) {
+    // TODO: Implementar validación de roles cuando el sistema de roles esté listo.
+  }
+
+  // -----------------------------------------------------------------------
+  // 5. Autenticado, con organización: renderizar
   // -----------------------------------------------------------------------
   return <>{children}</>;
 }

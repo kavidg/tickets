@@ -21,7 +21,7 @@ import type {
   SalesAnalytics,
 } from './interfaces/dashboard.interface';
 
-@Controller('api/v1/dashboard')
+@Controller('dashboard')
 @UseGuards(FirebaseAuthGuard)
 export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}

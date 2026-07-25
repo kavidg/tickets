@@ -54,15 +54,15 @@ export class PurchasesService extends FirestoreRepository<Purchase> {
    * pertenezcan al evento, tengan stock suficiente y estén activos.
    *
    * Los precios se obtienen de Firestore, no del frontend.
+   * Endpoint público — los datos del comprador se reciben en el DTO.
    *
-   * @param dto - Datos de creación validados por CreatePurchaseDto.
-   * @param user - Usuario autenticado (comprador).
+   * @param dto - Datos de creación validados por CreatePurchaseDto (incluye buyer).
    * @returns La Purchase creada con status 'pending'.
    *
    * @throws NotFoundException si el evento, organización o ticket type no existen.
    * @throws BadRequestException si hay errores de validación (stock, estado, etc.).
    */
-  async create(dto: CreatePurchaseDto, user: CurrentUser): Promise<Purchase> {
+  async create(dto: CreatePurchaseDto): Promise<Purchase> {
     // 1. Validar que el evento existe
     const eventData = await this.getRawDoc(COLLECTIONS.EVENTS, dto.eventId);
     if (!eventData) {
@@ -104,7 +104,10 @@ export class PurchasesService extends FirestoreRepository<Purchase> {
     try {
       // 6. Crear la compra primero para obtener el ID
       const purchaseData: Record<string, unknown> = {
-        userId: user.uid,
+        userId: '', // Compra pública sin autenticación
+        buyerName: dto.buyer.name,
+        buyerEmail: dto.buyer.email,
+        buyerPhone: dto.buyer.phone,
         organizationId: dto.organizationId,
         eventId: dto.eventId,
         items,
@@ -144,7 +147,7 @@ export class PurchasesService extends FirestoreRepository<Purchase> {
       }
 
       this.logger.log(
-        `Purchase created: ${purchase.id} (user: ${user.uid}, event: ${dto.eventId}, total: ${total})`,
+        `Purchase created: ${purchase.id} (buyer: ${dto.buyer.email}, event: ${dto.eventId}, total: ${total})`,
       );
 
       return purchase;

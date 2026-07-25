@@ -1,15 +1,12 @@
 /**
  * TicketS - Servicio de Eventos
  *
- * Capa de servicios que encapsula toda la comunicación con Firestore
- * para la gestión de eventos.
+ * Capa de servicios que encapsula toda la comunicación para la gestión de eventos.
  *
- * Colección: `events`
- *
- * Reglas de seguridad (ver FIRESTORE_RULES.md):
- *   - Los eventos publicados son legibles por cualquiera.
- *   - Los borradores solo por el organizador.
- *   - Solo el organizador puede crear/actualizar sus eventos.
+ * Los eventos públicos se consultan a través del backend NestJS API
+ * para evitar depender de reglas Firestore del lado del cliente.
+ * Los eventos de organizador y operaciones CRUD se realizan mediante
+ * la API REST del backend.
  */
 
 import {
@@ -37,16 +34,23 @@ import type {
 } from '../types/event';
 
 // ---------------------------------------------------------------------------
+// Constantes
+// ---------------------------------------------------------------------------
+
+const API_URL: string =
+  import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+
+// ---------------------------------------------------------------------------
 // Helpers privados
 // ---------------------------------------------------------------------------
 
 function handleEventError<T>(error: unknown): EventResponse<T> {
-  const firestoreError = error as { code?: string; message?: string };
-  const code = firestoreError?.code || 'events/unknown';
+  const err = error as { code?: string; message?: string };
+  const code = err?.code || 'events/unknown';
 
   return {
     success: false,
-    error: firestoreError?.message || 'Error al procesar el evento.',
+    error: err?.message || 'Error al procesar el evento.',
     code,
   } as EventResponse<T>;
 }
@@ -58,6 +62,11 @@ function handleEventError<T>(error: unknown): EventResponse<T> {
 /**
  * Obtiene los eventos públicos (publicados), ordenados por fecha de inicio.
  *
+ * Consulta el backend API en lugar de Firestore directamente para evitar
+ * errores de permisos cuando el usuario no está autenticado.
+ *
+ * El backend usa Firebase Admin SDK, que no está sujeto a reglas Firestore.
+ *
  * @param maxResults - Límite opcional de resultados.
  * @returns Lista de eventos publicados.
  *
@@ -66,26 +75,32 @@ function handleEventError<T>(error: unknown): EventResponse<T> {
  * const { data: latest } = await getPublicEvents(6);
  */
 export async function getPublicEvents(maxResults?: number): Promise<EventResponse<Event[]>> {
-  try {
-    let q = query(
-      collection(db, COLLECTIONS.EVENTS),
-      where('status', '==', 'published'),
-      orderBy('startDate', 'asc'),
-    );
+  console.log('[event-public] request');
 
+  try {
+    let url = `${API_URL}/events/public`;
     if (maxResults !== undefined) {
-      q = query(q, limit(maxResults));
+      url += `?maxResults=${maxResults}`;
     }
 
-    const snapshot = await getDocs(q);
-    const events: Event[] = [];
+    const res = await fetch(url);
+    const body = await res.json();
 
-    snapshot.forEach((docSnap) => {
-      events.push({ id: docSnap.id, ...docSnap.data() } as Event);
-    });
+    console.log('[event-public] response:', res.status);
 
+    if (!res.ok) {
+      return {
+        success: false,
+        error: body?.message || body?.error || 'Error al cargar eventos.',
+        code: `api/${res.status}`,
+      };
+    }
+
+    // El ResponseInterceptor del backend envuelve en { success, data, ... }
+    const events: Event[] = body?.data || [];
     return { success: true, data: events };
   } catch (error) {
+    console.log('[event-public] error:', error);
     return handleEventError(error);
   }
 }

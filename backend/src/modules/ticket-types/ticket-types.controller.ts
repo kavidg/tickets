@@ -28,7 +28,7 @@ import { UpdateTicketTypeDto } from './dto/update-ticket-type.dto';
 import type { CurrentUser as CurrentUserInterface } from '../auth/interfaces/current-user.interface';
 import type { TicketType } from './interfaces/ticket-type.interface';
 
-@Controller('api/v1/ticket-types')
+@Controller('ticket-types')
 @UseGuards(FirebaseAuthGuard)
 export class TicketTypesController {
   constructor(private readonly ticketTypesService: TicketTypesService) {}

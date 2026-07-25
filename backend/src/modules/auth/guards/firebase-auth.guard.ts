@@ -110,6 +110,14 @@ export class FirebaseAuthGuard implements CanActivate {
         city: (firestoreProfile.city as string) || '',
       };
 
+      console.log('[FirebaseAuthGuard] Setting request.user:', JSON.stringify({
+        uid: currentUser.uid,
+        email: currentUser.email,
+        role: currentUser.role,
+        organizationId: currentUser.organizationId,
+        profileFound: Object.keys(firestoreProfile).length > 0,
+      }));
+
       (request as unknown as Record<string, unknown>).user = currentUser;
 
       return true;

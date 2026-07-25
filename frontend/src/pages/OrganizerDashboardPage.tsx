@@ -1,9 +1,14 @@
 /**
- * TicketS - OrganizerDashboardPage (placeholder)
+ * TicketS - OrganizerDashboardPage
  *
  * Panel principal del organizador.
  * Protegida: requiere autenticación (futuro: role organizer).
- * Pendiente de implementar con el diseño del proyecto.
+ */
+
+import Button from '../components/ui/Button';
+
+/**
+ * Panel principal del organizador.
  */
 export default function OrganizerDashboardPage() {
   return (
@@ -14,9 +19,30 @@ export default function OrganizerDashboardPage() {
       <p className="mt-3 text-red-100/60">
         Administra tus eventos, entradas y reportes de ventas.
       </p>
-      <p className="mt-8 text-sm text-red-100/40">
-        Esta sección estará disponible próximamente.
-      </p>
+
+      <div className="mt-10 flex flex-col items-center gap-4">
+        <Button
+          href="/organizer/events"
+          variant="secondary"
+          className="min-w-[240px]"
+        >
+          Mis eventos
+        </Button>
+        <Button
+          href="/organizer/events/create"
+          variant="glow"
+          className="min-w-[240px]"
+        >
+          + Crear evento
+        </Button>
+        <Button
+          href="/organizer/venues"
+          variant="secondary"
+          className="min-w-[240px]"
+        >
+          Mis lugares
+        </Button>
+      </div>
     </main>
   );
 }
