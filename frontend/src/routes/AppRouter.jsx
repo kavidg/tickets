@@ -122,7 +122,7 @@ export default function AppRouter() {
   const { eventId, pathname } = usePathRouter();
 
   return (
-    <div className="min-h-screen bg-luxe-black font-sans text-red-50 antialiased">
+    <div className="min-h-screen bg-neutral-900 font-sans text-neutral-50 antialiased">
       <Header />
       {resolveRoute(eventId, pathname)}
       <Footer />

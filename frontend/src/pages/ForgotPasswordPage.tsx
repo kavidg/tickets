@@ -78,13 +78,13 @@ export default function ForgotPasswordPage() {
   return (
     <main className="relative flex min-h-[80vh] items-center justify-center overflow-hidden px-4 py-12">
       {/* Fondos decorativos */}
-      <div className="pointer-events-none absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full bg-luxe-wine/20 blur-3xl" />
-      <div className="pointer-events-none absolute bottom-0 right-0 h-64 w-64 rounded-full bg-luxe-ember/10 blur-3xl" />
+      <div className="pointer-events-none absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full bg-brand-muted/20 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-0 right-0 h-64 w-64 rounded-full bg-brand/10 blur-3xl" />
 
       <div className="relative w-full max-w-md">
         {/* Header del formulario */}
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-3xl border border-luxe-ember/30 bg-gradient-to-br from-luxe-wine to-luxe-black shadow-lg shadow-luxe-ember/20">
+          <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-3xl border border-brand/30 bg-gradient-to-br from-brand-muted to-neutral-900 shadow-lg shadow-brand/20">
             <span className="text-2xl font-black text-white">T</span>
           </div>
           <h1 className="text-3xl font-black tracking-tight text-white">
@@ -98,7 +98,7 @@ export default function ForgotPasswordPage() {
         {/* Formulario */}
         <form
           onSubmit={handleSubmit}
-          className="rounded-[2rem] border border-white/10 bg-white/[0.055] p-8 shadow-deep-luxe backdrop-blur-2xl"
+          className="rounded-[2rem] border border-white/10 bg-white/[0.055] p-8 shadow-card backdrop-blur-2xl"
           noValidate
         >
           {/* Mensaje de éxito */}
@@ -141,7 +141,7 @@ export default function ForgotPasswordPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={submitting}
-                  className="w-full rounded-2xl border border-white/10 bg-luxe-black/60 px-4 py-3 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+                  className="w-full rounded-2xl border border-white/10 bg-neutral-900/60 px-4 py-3 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
                 />
               </div>
 
@@ -168,7 +168,7 @@ export default function ForgotPasswordPage() {
           <div className="mt-6 text-center text-sm">
             <a
               href="/login"
-              className="font-semibold text-red-100/50 transition hover:text-luxe-ember"
+              className="font-semibold text-red-100/50 transition hover:text-brand"
             >
               Volver al inicio de sesión
             </a>

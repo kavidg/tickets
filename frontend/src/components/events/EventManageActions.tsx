@@ -100,10 +100,10 @@ export default function EventManageActions({
               title="Próximamente disponible"
             >
               <div className="mb-3 grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/[0.06]">
-                <Icon className="h-5 w-5 text-red-100/50" />
+                <Icon className="h-5 w-5 text-neutral-400" />
               </div>
               <p className="text-sm font-bold text-white">{action.label}</p>
-              <p className="mt-1 text-xs text-red-100/40">{action.description}</p>
+              <p className="mt-1 text-xs text-neutral-500">{action.description}</p>
             </div>
           );
         }
@@ -112,13 +112,13 @@ export default function EventManageActions({
           <a
             key={action.label}
             href={action.href}
-            className="group rounded-[1.5rem] border border-white/10 bg-white/[0.055] p-5 shadow-lg shadow-black/25 backdrop-blur-xl transition hover:border-luxe-ember/30 hover:bg-white/[0.08]"
+            className="group rounded-[1.5rem] border border-white/10 bg-white/[0.055] p-5 shadow-lg shadow-black/25 backdrop-blur-xl transition hover:border-brand/30 hover:bg-white/[0.08]"
           >
-            <div className="mb-3 grid h-10 w-10 place-items-center rounded-xl border border-luxe-ember/20 bg-luxe-wine/20">
-              <Icon className="h-5 w-5 text-luxe-ember" />
+            <div className="mb-3 grid h-10 w-10 place-items-center rounded-xl border border-brand/20 bg-brand/20">
+              <Icon className="h-5 w-5 text-brand-light" />
             </div>
             <p className="text-sm font-bold text-white">{action.label}</p>
-            <p className="mt-1 text-xs text-red-100/50">{action.description}</p>
+            <p className="mt-1 text-xs text-neutral-400">{action.description}</p>
           </a>
         );
       })}
@@ -126,7 +126,7 @@ export default function EventManageActions({
       {/* Enlace para ver evento en público */}
       <a
         href={`/event/${eventSlug}`}
-        className="group col-span-full rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-4 text-center text-sm font-semibold text-red-100/50 shadow-lg shadow-black/25 backdrop-blur-xl transition hover:border-luxe-ember/30 hover:text-luxe-ember"
+        className="group col-span-full rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-4 text-center text-sm font-semibold text-neutral-400 shadow-lg shadow-black/25 backdrop-blur-xl transition hover:border-brand/30 hover:text-brand-light"
       >
         ← Ver evento en público
       </a>

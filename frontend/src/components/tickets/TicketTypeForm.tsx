@@ -120,13 +120,13 @@ export default function TicketTypeForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-[1.75rem] border border-white/10 bg-white/[0.055] p-6 shadow-deep-luxe backdrop-blur-2xl"
+      className="rounded-[1.75rem] border border-white/10 bg-white/[0.055] p-6 shadow-card backdrop-blur-2xl"
       noValidate
     >
       <h3 className="text-lg font-black tracking-tight text-white">
         {initialData ? 'Editar tipo de entrada' : 'Nuevo tipo de entrada'}
       </h3>
-      <p className="mt-1 text-sm text-red-100/50">
+      <p className="mt-1 text-sm text-neutral-400">
         {initialData
           ? 'Modifica los campos del tipo de entrada'
           : 'Agrega un nuevo tipo de entrada al evento'}
@@ -147,7 +147,7 @@ export default function TicketTypeForm({
         <div>
           <label
             htmlFor="ticket-name"
-            className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-red-100/60"
+            className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-neutral-400"
           >
             Nombre *
           </label>
@@ -158,7 +158,7 @@ export default function TicketTypeForm({
             value={name}
             onChange={(e) => setName(e.target.value)}
             disabled={saving}
-            className="w-full rounded-xl border border-white/10 bg-luxe-black/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+            className="w-full rounded-xl border border-white/10 bg-neutral-800/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
           />
         </div>
 
@@ -166,7 +166,7 @@ export default function TicketTypeForm({
         <div>
           <label
             htmlFor="ticket-price"
-            className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-red-100/60"
+            className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-neutral-400"
           >
             Precio * (COP)
           </label>
@@ -179,7 +179,7 @@ export default function TicketTypeForm({
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             disabled={saving}
-            className="w-full rounded-xl border border-white/10 bg-luxe-black/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+            className="w-full rounded-xl border border-white/10 bg-neutral-800/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
           />
         </div>
 
@@ -187,7 +187,7 @@ export default function TicketTypeForm({
         <div>
           <label
             htmlFor="ticket-qty"
-            className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-red-100/60"
+            className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-neutral-400"
           >
             Cantidad disponible *
           </label>
@@ -200,7 +200,7 @@ export default function TicketTypeForm({
             value={quantity}
             onChange={(e) => setQuantity(e.target.value)}
             disabled={saving}
-            className="w-full rounded-xl border border-white/10 bg-luxe-black/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+            className="w-full rounded-xl border border-white/10 bg-neutral-800/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
           />
         </div>
 
@@ -208,7 +208,7 @@ export default function TicketTypeForm({
         <div>
           <label
             htmlFor="ticket-desc"
-            className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-red-100/60"
+            className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-neutral-400"
           >
             Descripción (opcional)
           </label>
@@ -219,7 +219,7 @@ export default function TicketTypeForm({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             disabled={saving}
-            className="w-full resize-none rounded-xl border border-white/10 bg-luxe-black/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+            className="w-full resize-none rounded-xl border border-white/10 bg-neutral-800/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
           />
         </div>
 
@@ -228,7 +228,7 @@ export default function TicketTypeForm({
           <div>
             <label
               htmlFor="ticket-sales-start"
-              className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-red-100/60"
+              className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-neutral-400"
             >
               Inicio venta
             </label>
@@ -238,13 +238,13 @@ export default function TicketTypeForm({
               value={salesStartDate}
               onChange={(e) => setSalesStartDate(e.target.value)}
               disabled={saving}
-              className="w-full rounded-xl border border-white/10 bg-luxe-black/60 px-4 py-2.5 text-sm text-white outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50 [color-scheme:dark]"
+              className="w-full rounded-xl border border-white/10 bg-neutral-800/60 px-4 py-2.5 text-sm text-white outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50 [color-scheme:dark]"
             />
           </div>
           <div>
             <label
               htmlFor="ticket-sales-end"
-              className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-red-100/60"
+              className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-neutral-400"
             >
               Fin venta
             </label>
@@ -254,13 +254,13 @@ export default function TicketTypeForm({
               value={salesEndDate}
               onChange={(e) => setSalesEndDate(e.target.value)}
               disabled={saving}
-              className="w-full rounded-xl border border-white/10 bg-luxe-black/60 px-4 py-2.5 text-sm text-white outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50 [color-scheme:dark]"
+              className="w-full rounded-xl border border-white/10 bg-neutral-800/60 px-4 py-2.5 text-sm text-white outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50 [color-scheme:dark]"
             />
           </div>
         </div>
 
         {/* Activo */}
-        <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/10 bg-luxe-black/60 px-4 py-3 transition hover:border-white/20">
+        <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/10 bg-neutral-800/60 px-4 py-3 transition hover:border-white/20">
           <div className="relative">
             <input
               type="checkbox"
@@ -269,14 +269,14 @@ export default function TicketTypeForm({
               disabled={saving}
               className="peer sr-only"
             />
-            <div className="h-5 w-10 rounded-full border border-white/15 bg-luxe-black transition peer-checked:border-green-500/50 peer-checked:bg-green-500/30" />
+            <div className="h-5 w-10 rounded-full border border-white/15 bg-neutral-900 transition peer-checked:border-green-500/50 peer-checked:bg-green-500/30" />
             <div className="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white/20 transition peer-checked:translate-x-5 peer-checked:bg-green-400" />
           </div>
           <div>
             <p className="text-sm font-bold text-white">
               {active ? 'Activo' : 'Inactivo'}
             </p>
-            <p className="text-xs text-red-100/40">
+            <p className="text-xs text-neutral-500">
               {active
                 ? 'Disponible para la venta al público'
                 : 'No se mostrará en la venta de entradas'}
@@ -292,7 +292,7 @@ export default function TicketTypeForm({
             type="button"
             onClick={onCancel}
             disabled={saving}
-            className="flex-1 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2.5 text-sm font-bold text-red-100/60 shadow-lg shadow-black/25 backdrop-blur-xl transition hover:border-white/20 disabled:opacity-50"
+            className="flex-1 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2.5 text-sm font-bold text-neutral-400 shadow-lg shadow-black/25 backdrop-blur-xl transition hover:border-white/20 disabled:opacity-50"
           >
             Cancelar
           </button>
@@ -300,7 +300,7 @@ export default function TicketTypeForm({
         <button
           type="submit"
           disabled={saving}
-          className="flex-1 rounded-2xl border border-luxe-ember/45 bg-gradient-to-r from-luxe-crimson to-luxe-ember px-4 py-2.5 text-sm font-bold text-white shadow-2xl shadow-luxe-ember/25 transition hover:from-luxe-wine hover:to-luxe-crimson disabled:opacity-50"
+          className="flex-1 rounded-2xl border border-brand/45 bg-gradient-to-r bg-brand px-4 py-2.5 text-sm font-bold text-white shadow-2xl shadow-button transition hover:bg-brand-light disabled:opacity-50"
         >
           {saving ? (
             <span className="inline-flex items-center gap-2">

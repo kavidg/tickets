@@ -132,13 +132,13 @@ export default function CategoryForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-[1.75rem] border border-white/10 bg-white/[0.055] p-6 shadow-deep-luxe backdrop-blur-2xl"
+      className="rounded-[1.75rem] border border-white/10 bg-white/[0.055] p-6 shadow-card backdrop-blur-2xl"
       noValidate
     >
       <h3 className="text-lg font-black tracking-tight text-white">
         {initialData ? 'Editar categoría' : 'Nueva categoría'}
       </h3>
-      <p className="mt-1 text-sm text-red-100/50">
+      <p className="mt-1 text-sm text-neutral-400">
         {initialData
           ? 'Modifica los campos de la categoría'
           : 'Agrega una nueva categoría de eventos'}
@@ -159,7 +159,7 @@ export default function CategoryForm({
         <div>
           <label
             htmlFor="cat-name"
-            className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-red-100/60"
+            className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-neutral-400"
           >
             Nombre *
           </label>
@@ -170,7 +170,7 @@ export default function CategoryForm({
             value={name}
             onChange={(e) => handleNameChange(e.target.value)}
             disabled={saving}
-            className="w-full rounded-xl border border-white/10 bg-luxe-black/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+            className="w-full rounded-xl border border-white/10 bg-neutral-800/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
           />
         </div>
 
@@ -178,7 +178,7 @@ export default function CategoryForm({
         <div>
           <label
             htmlFor="cat-slug"
-            className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-red-100/60"
+            className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-neutral-400"
           >
             Slug * (URL amigable)
           </label>
@@ -193,7 +193,7 @@ export default function CategoryForm({
                 setAutoSlug(false);
               }}
               disabled={saving}
-              className="flex-1 rounded-xl border border-white/10 bg-luxe-black/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+              className="flex-1 rounded-xl border border-white/10 bg-neutral-800/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
             />
             {!initialData && (
               <button
@@ -203,7 +203,7 @@ export default function CategoryForm({
                   setAutoSlug(true);
                 }}
                 disabled={saving}
-                className="rounded-xl border border-white/10 bg-white/[0.06] px-3 py-2.5 text-xs font-bold text-red-100/50 transition hover:border-luxe-ember/30 hover:text-luxe-ember disabled:opacity-50"
+                className="rounded-xl border border-white/10 bg-white/[0.06] px-3 py-2.5 text-xs font-bold text-neutral-400 transition hover:border-brand/30 hover:text-brand-light disabled:opacity-50"
                 title="Auto-generar slug desde el nombre"
               >
                 Auto
@@ -216,7 +216,7 @@ export default function CategoryForm({
         <div>
           <label
             htmlFor="cat-desc"
-            className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-red-100/60"
+            className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-neutral-400"
           >
             Descripción (opcional)
           </label>
@@ -228,9 +228,9 @@ export default function CategoryForm({
             onChange={(e) => setDescription(e.target.value)}
             disabled={saving}
             maxLength={500}
-            className="w-full resize-none rounded-xl border border-white/10 bg-luxe-black/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+            className="w-full resize-none rounded-xl border border-white/10 bg-neutral-800/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
           />
-          <p className="mt-1 text-right text-xs text-red-100/30">
+          <p className="mt-1 text-right text-xs text-neutral-500">
             {description.length}/500
           </p>
         </div>
@@ -239,7 +239,7 @@ export default function CategoryForm({
         <div>
           <label
             htmlFor="cat-image"
-            className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-red-100/60"
+            className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-neutral-400"
           >
             URL de imagen (opcional)
           </label>
@@ -250,7 +250,7 @@ export default function CategoryForm({
             value={imageUrl}
             onChange={(e) => setImageUrl(e.target.value)}
             disabled={saving}
-            className="w-full rounded-xl border border-white/10 bg-luxe-black/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+            className="w-full rounded-xl border border-white/10 bg-neutral-800/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
           />
         </div>
       </div>
@@ -262,7 +262,7 @@ export default function CategoryForm({
             type="button"
             onClick={onCancel}
             disabled={saving}
-            className="flex-1 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2.5 text-sm font-bold text-red-100/60 shadow-lg shadow-black/25 backdrop-blur-xl transition hover:border-white/20 disabled:opacity-50"
+            className="flex-1 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2.5 text-sm font-bold text-neutral-400 shadow-lg shadow-black/25 backdrop-blur-xl transition hover:border-white/20 disabled:opacity-50"
           >
             Cancelar
           </button>
@@ -270,7 +270,7 @@ export default function CategoryForm({
         <button
           type="submit"
           disabled={saving}
-          className="flex-1 rounded-2xl border border-luxe-ember/45 bg-gradient-to-r from-luxe-crimson to-luxe-ember px-4 py-2.5 text-sm font-bold text-white shadow-2xl shadow-luxe-ember/25 transition hover:from-luxe-wine hover:to-luxe-crimson disabled:opacity-50"
+          className="flex-1 rounded-2xl border border-brand/45 bg-gradient-to-r bg-brand px-4 py-2.5 text-sm font-bold text-white shadow-2xl shadow-button transition hover:bg-brand-light disabled:opacity-50"
         >
           {saving ? (
             <span className="inline-flex items-center gap-2">

@@ -2,58 +2,98 @@ import { ArrowRight, ShieldCheck, Sparkles, Ticket } from 'lucide-react';
 import Button from '../../../components/ui/Button.jsx';
 
 /**
- * Hero section showcasing the platform's value proposition
- * with a featured event card and CTAs.
+ * Full-screen hero section with minimalist design,
+ * gradient background, and a floating featured event card.
  */
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(193,18,31,0.24),transparent_34%),radial-gradient(circle_at_80%_12%,rgba(91,10,10,0.38),transparent_30%),linear-gradient(135deg,#050505_0%,#160606_46%,#050505_100%)]">
-      <div className="absolute right-0 top-10 h-64 w-64 rounded-full bg-luxe-ember/18 blur-3xl" />
-      <div className="absolute bottom-0 left-10 h-72 w-72 rounded-full bg-luxe-crimson/25 blur-3xl" />
-      <div className="absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-luxe-wine/20 blur-3xl" />
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-24">
-        <div className="relative z-10 flex flex-col justify-center">
-          <div className="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-luxe-ember/25 bg-white/[0.06] px-4 py-2 text-xs font-bold uppercase tracking-[0.24em] text-red-100 shadow-lg shadow-black/30 backdrop-blur-xl">
-            <Sparkles className="h-4 w-4 text-luxe-ember" /> Nuevas experiencias cada semana
+    <section className="relative flex min-h-[90vh] items-center justify-center overflow-hidden bg-neutral-900">
+      {/* Background gradient orbs */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -left-40 -top-40 h-[500px] w-[500px] rounded-full bg-brand/10 blur-[120px]" />
+        <div className="absolute -bottom-40 -right-40 h-[400px] w-[400px] rounded-full bg-brand/8 blur-[100px]" />
+        <div className="absolute left-1/2 top-1/3 h-[300px] w-[600px] -translate-x-1/2 bg-gradient-to-r from-transparent via-brand/5 to-transparent blur-[80px]" />
+      </div>
+
+      <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8 lg:py-32">
+        {/* Left: Text content */}
+        <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+          {/* Badge */}
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-4 py-1.5 text-xs font-medium text-neutral-300 backdrop-blur-sm">
+            <Sparkles className="h-3.5 w-3.5 text-brand-light" />
+            Nuevas experiencias cada semana
           </div>
-          <h1 className="max-w-3xl text-5xl font-black tracking-[-0.055em] text-white sm:text-6xl lg:text-7xl">
-            Encuentra el próximo evento que sí vas a recordar.
+
+          {/* Headline */}
+          <h1 className="max-w-3xl text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl xl:text-7xl">
+            El próximo evento{' '}
+            <span className="bg-gradient-to-r from-brand-light to-brand bg-clip-text text-transparent">
+              inolvidable
+            </span>{' '}
+            te espera.
           </h1>
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-red-100/68">
-            Una tiquetera moderna para descubrir conciertos y experiencias premium con compra rápida, entradas claras y beneficios exclusivos.
+
+          {/* Subtitle */}
+          <p className="mt-5 max-w-xl text-lg leading-relaxed text-neutral-400">
+            Descubre conciertos, festivales y experiencias únicas. Compra tus entradas de forma segura y vive momentos que recordarás siempre.
           </p>
+
+          {/* CTAs */}
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button href="/events" variant="glow" className="gap-2">
+            <Button href="/events" variant="primary" size="lg" className="gap-2">
               Explorar eventos <ArrowRight className="h-4 w-4" />
             </Button>
-            <Button href="/how-it-works" variant="secondary">Ver beneficios</Button>
+            <Button href="/how-it-works" variant="secondary" size="lg">
+              Cómo funciona
+            </Button>
           </div>
-          <div className="mt-8 grid gap-3 text-sm font-semibold text-red-100/60 sm:grid-cols-3">
-            <span className="flex items-center gap-2"><Ticket className="h-4 w-4 text-luxe-ember" /> Tickets instantáneos</span>
-            <span className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-luxe-ember" /> Pago seguro</span>
-            <span className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-luxe-ember" /> Beneficios unicos</span>
+
+          {/* Trust badges */}
+          <div className="mt-8 grid gap-2 text-sm text-neutral-500 sm:grid-cols-3 sm:gap-4">
+            <span className="flex items-center justify-center gap-2 lg:justify-start">
+              <Ticket className="h-4 w-4 text-brand-light" /> Tickets instantáneos
+            </span>
+            <span className="flex items-center justify-center gap-2 lg:justify-start">
+              <ShieldCheck className="h-4 w-4 text-brand-light" /> Pago seguro
+            </span>
+            <span className="flex items-center justify-center gap-2 lg:justify-start">
+              <Sparkles className="h-4 w-4 text-brand-light" /> Beneficios únicos
+            </span>
           </div>
         </div>
-        <div className="relative z-10">
-          <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.05] p-3 shadow-deep-luxe backdrop-blur-xl">
-            <img
-              className="h-[28rem] w-full rounded-[1.5rem] object-cover brightness-75 contrast-110 saturate-[0.9]"
-              src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1400&q=80"
-              alt="Público disfrutando un evento en vivo con luces de escenario"
-            />
-            <div className="absolute inset-3 rounded-[1.5rem] bg-gradient-to-t from-luxe-black/55 via-transparent to-luxe-wine/10" />
-            <div className="absolute bottom-6 left-6 right-6 rounded-3xl border border-white/10 bg-luxe-black/78 p-5 text-white shadow-2xl shadow-black/50 backdrop-blur-xl">
-              <p className="text-xs font-bold uppercase tracking-[0.22em] text-luxe-ember">Evento destacado</p>
-              <div className="mt-2 flex items-end justify-between gap-4">
-                <div>
-                  <h2 className="text-2xl font-black">Hugel Sessions Live</h2>
-                  <p className="mt-1 text-sm text-red-100/62">Sábado 16 mayo · Cali</p>
+
+        {/* Right: Featured event card */}
+        <div className="relative flex justify-center lg:justify-end">
+          <div className="relative w-full max-w-md animate-fade-in-up">
+            <div className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-neutral-800/60 p-2 shadow-2xl backdrop-blur-sm">
+              <img
+                className="h-[26rem] w-full rounded-2xl object-cover brightness-75"
+                src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=800&q=80"
+                alt="Público disfrutando un evento en vivo"
+              />
+              <div className="absolute inset-2 rounded-2xl bg-gradient-to-t from-neutral-900/80 via-transparent to-transparent" />
+              <div className="absolute bottom-4 left-4 right-4 rounded-2xl border border-white/[0.08] bg-neutral-900/80 p-4 shadow-xl backdrop-blur-xl">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-brand-light">
+                  Evento destacado
+                </p>
+                <div className="mt-2 flex items-end justify-between gap-3">
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Hugel Sessions Live</h3>
+                    <p className="mt-0.5 text-xs text-neutral-400">Sábado 16 mayo · Cali</p>
+                  </div>
+                  <span className="whitespace-nowrap rounded-lg bg-brand/20 px-3 py-1.5 text-xs font-bold text-brand-light">
+                    Desde $60.000
+                  </span>
                 </div>
-                <span className="rounded-2xl border border-luxe-ember/30 bg-luxe-ember/90 px-4 py-2 text-sm font-black text-white shadow-lg shadow-luxe-ember/25">Desde $60.000</span>
               </div>
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Scroll indicator */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+        <div className="h-8 w-5 rounded-full border border-white/[0.15]" />
       </div>
     </section>
   );

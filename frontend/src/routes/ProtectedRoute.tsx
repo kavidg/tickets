@@ -168,7 +168,7 @@ export default function ProtectedRoute({
       <main className="flex min-h-[70vh] items-center justify-center px-4">
         <div className="text-center">
           <div
-            className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-luxe-ember/30 border-t-luxe-ember"
+            className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-brand/30 border-t-brand"
             role="status"
             aria-label="Verificando sesión"
           />

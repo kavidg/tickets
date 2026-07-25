@@ -134,13 +134,13 @@ export default function VenuesPage() {
 
   return (
     <main className="relative mx-auto max-w-4xl px-4 py-12">
-      <div className="pointer-events-none absolute left-0 top-0 h-80 w-80 rounded-full bg-luxe-wine/15 blur-3xl" />
-      <div className="pointer-events-none absolute right-0 top-40 h-64 w-64 rounded-full bg-luxe-ember/10 blur-3xl" />
+      <div className="pointer-events-none absolute left-0 top-0 h-80 w-80 rounded-full bg-brand-muted/15 blur-3xl" />
+      <div className="pointer-events-none absolute right-0 top-40 h-64 w-64 rounded-full bg-brand/10 blur-3xl" />
 
       <div className="relative">
         {/* Encabezado */}
         <div className="mb-8">
-          <p className="text-sm font-black uppercase tracking-[0.22em] text-luxe-ember">
+          <p className="text-sm font-black uppercase tracking-[0.22em] text-brand">
             Organizador
           </p>
           <h1 className="mt-2 text-3xl font-black tracking-tight text-white">
@@ -158,13 +158,13 @@ export default function VenuesPage() {
             <input
               type="text" placeholder="Buscar lugares…"
               value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-luxe-black/60 py-2.5 pl-9 pr-4 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15"
+              className="w-full rounded-xl border border-white/10 bg-neutral-900/60 py-2.5 pl-9 pr-4 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15"
             />
           </div>
           {!showForm && !editingId && (
             <button
               onClick={() => setShowForm(true)}
-              className="inline-flex items-center gap-2 rounded-2xl border border-luxe-ember/45 bg-gradient-to-r from-luxe-crimson to-luxe-ember px-5 py-3 text-sm font-bold text-white shadow-2xl shadow-luxe-ember/25 transition hover:from-luxe-wine hover:to-luxe-crimson"
+              className="inline-flex items-center gap-2 rounded-2xl border border-brand/45 bg-gradient-to-r from-brand to-brand px-5 py-3 text-sm font-bold text-white shadow-2xl shadow-brand/25 transition hover:from-brand-muted hover:to-brand"
             >
               + Nuevo lugar
             </button>
@@ -233,7 +233,7 @@ export default function VenuesPage() {
             {!searchQuery && (
               <button
                 onClick={() => setShowForm(true)}
-                className="mt-6 inline-flex items-center gap-2 rounded-2xl border border-luxe-ember/45 bg-gradient-to-r from-luxe-crimson to-luxe-ember px-5 py-3 text-sm font-bold text-white shadow-2xl shadow-luxe-ember/25 transition hover:from-luxe-wine hover:to-luxe-crimson"
+                className="mt-6 inline-flex items-center gap-2 rounded-2xl border border-brand/45 bg-gradient-to-r from-brand to-brand px-5 py-3 text-sm font-bold text-white shadow-2xl shadow-brand/25 transition hover:from-brand-muted hover:to-brand"
               >
                 + Crear lugar
               </button>
@@ -246,7 +246,7 @@ export default function VenuesPage() {
               return (
                 <div
                   key={venue.id}
-                  className="rounded-[1.75rem] border border-white/10 bg-white/[0.055] p-6 shadow-2xl shadow-black/35 backdrop-blur-xl transition hover:border-luxe-ember/30"
+                  className="rounded-[1.75rem] border border-white/10 bg-white/[0.055] p-6 shadow-2xl shadow-black/35 backdrop-blur-xl transition hover:border-brand/30"
                 >
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex-1">
@@ -269,7 +269,7 @@ export default function VenuesPage() {
                   <div className="mt-4 flex items-center gap-3">
                     <button
                       onClick={() => setEditingId(venue.id)} disabled={saving}
-                      className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.06] px-4 py-2 text-xs font-bold text-red-100/60 shadow-lg shadow-black/25 backdrop-blur-xl transition hover:border-luxe-ember/40 hover:text-luxe-ember disabled:opacity-50"
+                      className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.06] px-4 py-2 text-xs font-bold text-red-100/60 shadow-lg shadow-black/25 backdrop-blur-xl transition hover:border-brand/40 hover:text-brand disabled:opacity-50"
                     >
                       Editar
                     </button>

@@ -103,13 +103,13 @@ export default function VenueForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-[1.75rem] border border-white/10 bg-white/[0.055] p-6 shadow-deep-luxe backdrop-blur-2xl"
+      className="rounded-[1.75rem] border border-white/10 bg-white/[0.055] p-6 shadow-card backdrop-blur-2xl"
       noValidate
     >
       <h3 className="text-lg font-black tracking-tight text-white">
         {initialData ? 'Editar lugar' : 'Nuevo lugar'}
       </h3>
-      <p className="mt-1 text-sm text-red-100/50">
+      <p className="mt-1 text-sm text-neutral-400">
         {initialData
           ? 'Modifica los campos del lugar'
           : 'Agrega un nuevo lugar para tus eventos'}
@@ -128,75 +128,75 @@ export default function VenueForm({
         {/* Nombre y Ciudad */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="venue-name" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-red-100/60">
+            <label htmlFor="venue-name" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-neutral-400">
               Nombre *
             </label>
             <input
               id="venue-name" type="text" placeholder="Centro de Eventos, Acopi"
               value={name} onChange={(e) => setName(e.target.value)}
               disabled={saving}
-              className="w-full rounded-xl border border-white/10 bg-luxe-black/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+              className="w-full rounded-xl border border-white/10 bg-neutral-800/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
             />
           </div>
           <div>
-            <label htmlFor="venue-city" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-red-100/60">
+            <label htmlFor="venue-city" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-neutral-400">
               Ciudad *
             </label>
             <input
               id="venue-city" type="text" placeholder="Cali"
               value={city} onChange={(e) => setCity(e.target.value)}
               disabled={saving}
-              className="w-full rounded-xl border border-white/10 bg-luxe-black/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+              className="w-full rounded-xl border border-white/10 bg-neutral-800/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
             />
           </div>
         </div>
 
         {/* Dirección */}
         <div>
-          <label htmlFor="venue-address" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-red-100/60">
+          <label htmlFor="venue-address" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-neutral-400">
             Dirección
           </label>
           <input
             id="venue-address" type="text" placeholder="Calle 5 # 20-30"
             value={address} onChange={(e) => setAddress(e.target.value)}
             disabled={saving}
-            className="w-full rounded-xl border border-white/10 bg-luxe-black/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+            className="w-full rounded-xl border border-white/10 bg-neutral-800/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
           />
         </div>
 
         {/* Estado, País, Código Postal */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>
-            <label htmlFor="venue-state" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-red-100/60">
+            <label htmlFor="venue-state" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-neutral-400">
               Estado / Dpto.
             </label>
             <input
               id="venue-state" type="text" placeholder="Valle del Cauca"
               value={state} onChange={(e) => setState(e.target.value)}
               disabled={saving}
-              className="w-full rounded-xl border border-white/10 bg-luxe-black/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+              className="w-full rounded-xl border border-white/10 bg-neutral-800/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
             />
           </div>
           <div>
-            <label htmlFor="venue-country" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-red-100/60">
+            <label htmlFor="venue-country" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-neutral-400">
               País
             </label>
             <input
               id="venue-country" type="text" placeholder="Colombia"
               value={country} onChange={(e) => setCountry(e.target.value)}
               disabled={saving}
-              className="w-full rounded-xl border border-white/10 bg-luxe-black/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+              className="w-full rounded-xl border border-white/10 bg-neutral-800/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
             />
           </div>
           <div>
-            <label htmlFor="venue-postal" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-red-100/60">
+            <label htmlFor="venue-postal" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-neutral-400">
               Código Postal
             </label>
             <input
               id="venue-postal" type="text" placeholder="760001"
               value={postalCode} onChange={(e) => setPostalCode(e.target.value)}
               disabled={saving}
-              className="w-full rounded-xl border border-white/10 bg-luxe-black/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+              className="w-full rounded-xl border border-white/10 bg-neutral-800/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
             />
           </div>
         </div>
@@ -204,36 +204,36 @@ export default function VenueForm({
         {/* Capacidad y coordenadas */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>
-            <label htmlFor="venue-capacity" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-red-100/60">
+            <label htmlFor="venue-capacity" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-neutral-400">
               Capacidad
             </label>
             <input
               id="venue-capacity" type="number" min="0" placeholder="5000"
               value={capacity} onChange={(e) => setCapacity(e.target.value)}
               disabled={saving}
-              className="w-full rounded-xl border border-white/10 bg-luxe-black/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+              className="w-full rounded-xl border border-white/10 bg-neutral-800/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
             />
           </div>
           <div>
-            <label htmlFor="venue-lat" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-red-100/60">
+            <label htmlFor="venue-lat" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-neutral-400">
               Latitud
             </label>
             <input
               id="venue-lat" type="text" placeholder="3.4516"
               value={latitude} onChange={(e) => setLatitude(e.target.value)}
               disabled={saving}
-              className="w-full rounded-xl border border-white/10 bg-luxe-black/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+              className="w-full rounded-xl border border-white/10 bg-neutral-800/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
             />
           </div>
           <div>
-            <label htmlFor="venue-lng" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-red-100/60">
+            <label htmlFor="venue-lng" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-neutral-400">
               Longitud
             </label>
             <input
               id="venue-lng" type="text" placeholder="-76.5325"
               value={longitude} onChange={(e) => setLongitude(e.target.value)}
               disabled={saving}
-              className="w-full rounded-xl border border-white/10 bg-luxe-black/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+              className="w-full rounded-xl border border-white/10 bg-neutral-800/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
             />
           </div>
         </div>
@@ -241,25 +241,25 @@ export default function VenueForm({
         {/* Descripción e imagen */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="venue-desc" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-red-100/60">
+            <label htmlFor="venue-desc" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-neutral-400">
               Descripción
             </label>
             <textarea
               id="venue-desc" rows={2} placeholder="Descripción del lugar…"
               value={description} onChange={(e) => setDescription(e.target.value)}
               disabled={saving}
-              className="w-full resize-none rounded-xl border border-white/10 bg-luxe-black/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+              className="w-full resize-none rounded-xl border border-white/10 bg-neutral-800/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
             />
           </div>
           <div>
-            <label htmlFor="venue-image" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-red-100/60">
+            <label htmlFor="venue-image" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-neutral-400">
               URL de imagen
             </label>
             <input
               id="venue-image" type="url" placeholder="https://ejemplo.com/lugar.jpg"
               value={imageUrl} onChange={(e) => setImageUrl(e.target.value)}
               disabled={saving}
-              className="w-full rounded-xl border border-white/10 bg-luxe-black/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+              className="w-full rounded-xl border border-white/10 bg-neutral-800/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
             />
           </div>
         </div>
@@ -270,14 +270,14 @@ export default function VenueForm({
         {onCancel && (
           <button
             type="button" onClick={onCancel} disabled={saving}
-            className="flex-1 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2.5 text-sm font-bold text-red-100/60 shadow-lg shadow-black/25 backdrop-blur-xl transition hover:border-white/20 disabled:opacity-50"
+            className="flex-1 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2.5 text-sm font-bold text-neutral-400 shadow-lg shadow-black/25 backdrop-blur-xl transition hover:border-white/20 disabled:opacity-50"
           >
             Cancelar
           </button>
         )}
         <button
           type="submit" disabled={saving}
-          className="flex-1 rounded-2xl border border-luxe-ember/45 bg-gradient-to-r from-luxe-crimson to-luxe-ember px-4 py-2.5 text-sm font-bold text-white shadow-2xl shadow-luxe-ember/25 transition hover:from-luxe-wine hover:to-luxe-crimson disabled:opacity-50"
+          className="flex-1 rounded-2xl border border-brand/45 bg-gradient-to-r bg-brand px-4 py-2.5 text-sm font-bold text-white shadow-2xl shadow-button transition hover:bg-brand-light disabled:opacity-50"
         >
           {saving ? (
             <span className="inline-flex items-center gap-2">

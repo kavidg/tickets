@@ -125,13 +125,13 @@ export default function MyProfilePage() {
   return (
     <main className="relative mx-auto max-w-2xl px-4 py-12">
       {/* Fondos decorativos */}
-      <div className="pointer-events-none absolute left-0 top-0 h-80 w-80 rounded-full bg-luxe-wine/15 blur-3xl" />
-      <div className="pointer-events-none absolute right-0 top-40 h-64 w-64 rounded-full bg-luxe-ember/10 blur-3xl" />
+      <div className="pointer-events-none absolute left-0 top-0 h-80 w-80 rounded-full bg-brand-muted/15 blur-3xl" />
+      <div className="pointer-events-none absolute right-0 top-40 h-64 w-64 rounded-full bg-brand/10 blur-3xl" />
 
       <div className="relative">
         {/* Encabezado */}
         <div className="mb-8">
-          <p className="text-sm font-black uppercase tracking-[0.22em] text-luxe-ember">
+          <p className="text-sm font-black uppercase tracking-[0.22em] text-brand">
             Mi cuenta
           </p>
           <h1 className="mt-2 text-3xl font-black tracking-tight text-white">
@@ -146,7 +146,7 @@ export default function MyProfilePage() {
         {loading && (
           <div className="flex items-center justify-center py-20">
             <div
-              className="h-10 w-10 animate-spin rounded-full border-4 border-luxe-ember/30 border-t-luxe-ember"
+              className="h-10 w-10 animate-spin rounded-full border-4 border-brand/30 border-t-brand"
               role="status"
               aria-label="Cargando perfil"
             />
@@ -157,7 +157,7 @@ export default function MyProfilePage() {
         {!loading && (
           <form
             onSubmit={handleSubmit}
-            className="rounded-[2rem] border border-white/10 bg-white/[0.055] p-8 shadow-deep-luxe backdrop-blur-2xl"
+            className="rounded-[2rem] border border-white/10 bg-white/[0.055] p-8 shadow-card backdrop-blur-2xl"
             noValidate
           >
             {/* Mensaje de éxito */}
@@ -248,7 +248,7 @@ export default function MyProfilePage() {
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 disabled={saving}
-                className="w-full rounded-2xl border border-white/10 bg-luxe-black/60 px-4 py-3 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+                className="w-full rounded-2xl border border-white/10 bg-neutral-900/60 px-4 py-3 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
               />
             </div>
 
@@ -268,7 +268,7 @@ export default function MyProfilePage() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 disabled={saving}
-                className="w-full rounded-2xl border border-white/10 bg-luxe-black/60 px-4 py-3 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+                className="w-full rounded-2xl border border-white/10 bg-neutral-900/60 px-4 py-3 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
               />
             </div>
 
@@ -288,7 +288,7 @@ export default function MyProfilePage() {
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 disabled={saving}
-                className="w-full rounded-2xl border border-white/10 bg-luxe-black/60 px-4 py-3 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+                className="w-full rounded-2xl border border-white/10 bg-neutral-900/60 px-4 py-3 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
               />
             </div>
 

@@ -1,28 +1,60 @@
 import { BadgeCheck, Clock3, LockKeyhole } from 'lucide-react';
 
 const benefits = [
-  { icon: LockKeyhole, title: 'Checkout seguro', text: 'Compra en pocos pasos con confirmación inmediata.' },
-  { icon: Clock3, title: 'Sin fricción', text: 'Entradas digitales listas para mostrar desde el móvil.' },
-  { icon: BadgeCheck, title: 'Eventos verificados', text: 'Organizadores garantizados y experiencias unicas.' },
+  {
+    icon: LockKeyhole,
+    title: 'Checkout seguro',
+    text: 'Compra en pocos pasos con confirmación inmediata. Tu información está protegida en todo momento.',
+  },
+  {
+    icon: Clock3,
+    title: 'Sin fricción',
+    text: 'Entradas digitales listas para mostrar desde tu móvil. Sin filas, sin papel, sin complicaciones.',
+  },
+  {
+    icon: BadgeCheck,
+    title: 'Eventos verificados',
+    text: 'Organizadores garantizados y experiencias únicas. Cada evento pasa por un proceso de verificación.',
+  },
 ];
 
 /**
  * Conversion band highlighting key platform benefits
- * (secure checkout, frictionless experience, verified events).
+ * with modern card design.
  */
 export default function ConversionBand() {
   return (
-    <section id="how-it-works" className="relative overflow-hidden bg-luxe-black py-14 text-white">
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-luxe-ember/50 to-transparent" />
-      <div className="absolute left-1/2 top-0 h-72 w-72 -translate-x-1/2 rounded-full bg-luxe-ember/10 blur-3xl" />
-      <div className="relative mx-auto grid max-w-7xl gap-5 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
-        {benefits.map(({ icon: Icon, title, text }) => (
-          <div key={title} className="rounded-[1.5rem] border border-white/10 bg-white/[0.055] p-6 shadow-2xl shadow-black/35 backdrop-blur-xl">
-            <Icon className="h-8 w-8 text-luxe-ember" />
-            <h3 className="mt-4 text-xl font-black">{title}</h3>
-            <p className="mt-2 text-sm leading-6 text-red-100/58">{text}</p>
-          </div>
-        ))}
+    <section id="how-it-works" className="relative overflow-hidden bg-neutral-900 py-20">
+      {/* Top gradient line */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
+
+      <div className="section-container relative">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="text-xs font-semibold uppercase tracking-widest text-brand-light">
+            Beneficios
+          </p>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            Por qué elegir PulsePass
+          </h2>
+          <p className="mt-4 text-neutral-400">
+            Una experiencia de compra diseñada para que disfrutes lo que realmente importa: el evento.
+          </p>
+        </div>
+
+        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {benefits.map(({ icon: Icon, title, text }) => (
+            <div
+              key={title}
+              className="card-base group p-6 transition-all duration-300 hover:-translate-y-0.5"
+            >
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-brand-muted text-brand-light transition group-hover:bg-brand/20 group-hover:text-brand-light">
+                <Icon className="h-5 w-5" />
+              </div>
+              <h3 className="mt-4 text-lg font-semibold text-white">{title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-neutral-400">{text}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

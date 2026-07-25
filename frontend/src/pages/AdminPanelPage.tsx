@@ -19,8 +19,8 @@ export default function AdminPanelPage() {
   return (
     <main className="relative mx-auto max-w-6xl px-4 py-20 text-center">
       {/* Fondos decorativos */}
-      <div className="pointer-events-none absolute left-0 top-0 h-80 w-80 rounded-full bg-luxe-wine/15 blur-3xl" />
-      <div className="pointer-events-none absolute right-0 top-40 h-64 w-64 rounded-full bg-luxe-ember/10 blur-3xl" />
+      <div className="pointer-events-none absolute left-0 top-0 h-80 w-80 rounded-full bg-brand-muted/15 blur-3xl" />
+      <div className="pointer-events-none absolute right-0 top-40 h-64 w-64 rounded-full bg-brand/10 blur-3xl" />
 
       <div className="relative">
         <h1 className="text-3xl font-black tracking-tight text-white">

@@ -1,20 +1,28 @@
+import { CalendarX } from 'lucide-react';
 import EventCard from './EventCard.jsx';
 
 /**
- * Grid layout that renders a list of EventCards or an empty state message.
+ * Grid layout that renders EventCards or a modern empty state.
  */
 export default function EventGrid({ events }) {
   if (!events.length) {
     return (
-      <div className="rounded-[1.75rem] border border-dashed border-luxe-ember/25 bg-white/[0.055] p-10 text-center shadow-2xl shadow-black/30 backdrop-blur-xl">
-        <p className="text-lg font-black text-white">No encontramos eventos con esos filtros.</p>
-        <p className="mt-2 text-red-100/55">Prueba otra categoría o amplía el rango de fechas.</p>
+      <div className="card-base flex flex-col items-center justify-center p-12 text-center">
+        <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-neutral-800">
+          <CalendarX className="h-6 w-6 text-neutral-400" />
+        </div>
+        <h3 className="mt-4 text-lg font-semibold text-white">
+          No encontramos eventos
+        </h3>
+        <p className="mt-2 max-w-sm text-sm text-neutral-400">
+          No hay eventos disponibles con los filtros seleccionados. Prueba otra categoría o amplía el rango de fechas.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {events.map((event) => (
         <EventCard key={event.id} event={event} />
       ))}

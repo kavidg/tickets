@@ -3,26 +3,55 @@ import { formatDate, formatPrice } from '../../../utils/format.js';
 import Button from '../../../components/ui/Button.jsx';
 
 /**
- * Card that displays a single event's summary with image, category, price,
- * date, location, and a CTA button to view tickets.
+ * Modern event card with image, category badge, price, date, location,
+ * and a CTA button. Clean design with subtle hover lift effect.
  */
 export default function EventCard({ event }) {
   return (
-    <article className="group overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/[0.055] shadow-2xl shadow-black/35 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-luxe-ember/30 hover:shadow-red-glow">
+    <article className="card-base group overflow-hidden p-0 transition-all duration-300 hover:-translate-y-1">
+      {/* Image */}
       <a href={`/event/${event.id}`} className="block overflow-hidden">
-        <img className="h-56 w-full object-cover brightness-75 contrast-110 saturate-[0.85] transition duration-500 group-hover:scale-105 group-hover:brightness-90" src={event.image} alt={event.title} />
+        <div className="relative aspect-[16/9] overflow-hidden">
+          <img
+            className="h-full w-full object-cover brightness-90 saturate-[0.9] transition duration-500 group-hover:scale-105 group-hover:brightness-100"
+            src={event.image}
+            alt={event.title}
+            loading="lazy"
+          />
+          {/* Category badge overlay */}
+          <span className="absolute left-3 top-3 rounded-lg border border-white/[0.12] bg-neutral-900/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-neutral-200 backdrop-blur-sm">
+            {event.category}
+          </span>
+        </div>
       </a>
-      <div className="p-5">
-        <div className="mb-4 flex items-center justify-between gap-3">
-          <span className="rounded-full border border-luxe-ember/20 bg-luxe-wine/35 px-3 py-1 text-xs font-black uppercase tracking-[0.18em] text-red-100">{event.category}</span>
-          <span className="text-lg font-black text-white">{formatPrice(event.price)}</span>
+
+      {/* Content */}
+      <div className="p-4 sm:p-5">
+        <h3 className="text-base font-bold tracking-tight text-white sm:text-lg">
+          <a href={`/event/${event.id}`} className="transition hover:text-brand-light">
+            {event.title}
+          </a>
+        </h3>
+
+        <div className="mt-3 space-y-1.5 text-xs text-neutral-400">
+          <p className="flex items-center gap-1.5">
+            <Calendar className="h-3.5 w-3.5 text-brand-light" />
+            {formatDate(event.date)}
+          </p>
+          <p className="flex items-center gap-1.5">
+            <MapPin className="h-3.5 w-3.5 text-brand-light" />
+            {event.location}
+          </p>
         </div>
-        <h3 className="text-xl font-black tracking-tight text-white">{event.title}</h3>
-        <div className="mt-4 space-y-2 text-sm font-semibold text-red-100/55">
-          <p className="flex items-center gap-2"><Calendar className="h-4 w-4 text-luxe-ember" /> {formatDate(event.date)}</p>
-          <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-luxe-ember" /> {event.location}</p>
+
+        <div className="mt-4 flex items-center justify-between">
+          <span className="text-base font-bold text-white">
+            {formatPrice(event.price)}
+          </span>
+          <Button href={`/event/${event.id}`} variant="outline" size="sm">
+            Ver entradas
+          </Button>
         </div>
-        <Button href={`/event/${event.id}`} className="mt-5 w-full">Ver entradas</Button>
       </div>
     </article>
   );

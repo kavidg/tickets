@@ -1,17 +1,25 @@
 /**
- * Reusable button component supporting multiple visual variants
- * and rendering as either <button> or <a> when href is provided.
+ * Reusable button component with modern variants.
+ * Supports rendering as <button> or <a> when href is provided.
  */
-export default function Button({ children, href = '', variant = 'primary', className = '', ...props }) {
-  const base =
-    'inline-flex items-center justify-center rounded-2xl px-5 py-3 text-sm font-bold transition duration-200 focus:outline-none focus:ring-4 focus:ring-luxe-ember/25';
-  const styles = {
-    primary: 'border border-luxe-ember/30 bg-luxe-wine text-white shadow-xl shadow-black/35 hover:-translate-y-0.5 hover:bg-luxe-crimson hover:shadow-red-glow',
-    secondary: 'border border-white/10 bg-white/[0.06] text-red-50 shadow-lg shadow-black/25 backdrop-blur-xl hover:border-luxe-ember/45 hover:bg-luxe-wine/30 hover:text-white',
-    glow: 'border border-luxe-ember/45 bg-gradient-to-r from-luxe-crimson to-luxe-ember text-white shadow-2xl shadow-luxe-ember/25 hover:-translate-y-0.5 hover:from-luxe-wine hover:to-luxe-crimson hover:shadow-red-glow',
+export default function Button({ children, href = '', variant = 'primary', className = '', size = 'default', ...props }) {
+  const base = 'inline-flex items-center justify-center font-semibold transition-all duration-200 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-brand/20 disabled:cursor-not-allowed disabled:opacity-50';
+
+  const sizes = {
+    sm: 'rounded-lg px-4 py-2 text-xs gap-1.5',
+    default: 'rounded-xl px-6 py-3 text-sm gap-2',
+    lg: 'rounded-xl px-8 py-4 text-base gap-2.5',
   };
 
-  const classes = `${base} ${styles[variant]} ${className}`;
+  const styles = {
+    primary: 'bg-brand text-white shadow-button hover:bg-brand-light hover:shadow-glow',
+    secondary: 'border border-white/[0.1] bg-neutral-800 text-neutral-200 shadow-sm hover:border-white/20 hover:bg-neutral-700 hover:text-white',
+    outline: 'border border-brand/40 text-brand-light hover:bg-brand-muted hover:text-brand-light',
+    ghost: 'text-neutral-400 hover:bg-white/[0.05] hover:text-neutral-200',
+    glow: 'bg-brand text-white shadow-glow-lg hover:bg-brand-light hover:shadow-glow',
+  };
+
+  const classes = `${base} ${sizes[size]} ${styles[variant]} ${className}`;
 
   if (href) {
     return (

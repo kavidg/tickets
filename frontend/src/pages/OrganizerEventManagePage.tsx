@@ -70,7 +70,7 @@ function LoadingState() {
   return (
     <div className="flex min-h-[50vh] items-center justify-center">
       <div
-        className="h-10 w-10 animate-spin rounded-full border-4 border-luxe-ember/30 border-t-luxe-ember"
+        className="h-10 w-10 animate-spin rounded-full border-4 border-brand/30 border-t-brand"
         role="status"
         aria-label="Cargando evento"
       />
@@ -88,7 +88,7 @@ function NotFoundState() {
       </p>
       <a
         href="/organizer/events"
-        className="mt-6 inline-flex items-center gap-2 rounded-2xl border border-luxe-ember/30 bg-luxe-wine px-5 py-3 text-sm font-bold text-white shadow-xl shadow-black/35 transition hover:bg-luxe-crimson"
+        className="mt-6 inline-flex items-center gap-2 rounded-2xl border border-brand/30 bg-brand-muted px-5 py-3 text-sm font-bold text-white shadow-xl shadow-black/35 transition hover:bg-brand"
       >
         ← Volver a mis eventos
       </a>
@@ -104,7 +104,7 @@ function ErrorState({ message }: { message: string }) {
       <p className="mt-2 text-sm text-red-100/55">{message}</p>
       <a
         href="/organizer/events"
-        className="mt-6 inline-flex items-center gap-2 rounded-2xl border border-luxe-ember/30 bg-luxe-wine px-5 py-3 text-sm font-bold text-white shadow-xl shadow-black/35 transition hover:bg-luxe-crimson"
+        className="mt-6 inline-flex items-center gap-2 rounded-2xl border border-brand/30 bg-brand-muted px-5 py-3 text-sm font-bold text-white shadow-xl shadow-black/35 transition hover:bg-brand"
       >
         ← Volver a mis eventos
       </a>
@@ -148,14 +148,14 @@ export default function OrganizerEventManagePage() {
   return (
     <main className="relative mx-auto max-w-5xl px-4 py-12">
       {/* Fondos decorativos */}
-      <div className="pointer-events-none absolute left-0 top-0 h-80 w-80 rounded-full bg-luxe-wine/15 blur-3xl" />
-      <div className="pointer-events-none absolute right-0 top-40 h-64 w-64 rounded-full bg-luxe-ember/10 blur-3xl" />
+      <div className="pointer-events-none absolute left-0 top-0 h-80 w-80 rounded-full bg-brand-muted/15 blur-3xl" />
+      <div className="pointer-events-none absolute right-0 top-40 h-64 w-64 rounded-full bg-brand/10 blur-3xl" />
 
       <div className="relative">
         {/* Navegación superior */}
         <a
           href="/organizer/events"
-          className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-red-100/50 transition hover:text-luxe-ember"
+          className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-red-100/50 transition hover:text-brand"
         >
           ← Mis eventos
         </a>
@@ -163,7 +163,7 @@ export default function OrganizerEventManagePage() {
         {/* Encabezado */}
         <div className="mb-8">
           <div className="flex items-center gap-3">
-            <p className="text-sm font-black uppercase tracking-[0.22em] text-luxe-ember">
+            <p className="text-sm font-black uppercase tracking-[0.22em] text-brand">
               Gestión de evento
             </p>
             <span
@@ -194,7 +194,7 @@ export default function OrganizerEventManagePage() {
                   className="h-full w-full object-cover"
                 />
               ) : (
-                <div className="flex h-full items-center justify-center bg-luxe-black/60">
+                <div className="flex h-full items-center justify-center bg-neutral-900/60">
                   <span className="text-5xl opacity-20">🎪</span>
                 </div>
               )}
@@ -254,7 +254,7 @@ export default function OrganizerEventManagePage() {
         {/* Panel de acciones */}
         <section>
           <div className="mb-6">
-            <p className="text-sm font-black uppercase tracking-[0.22em] text-luxe-ember">
+            <p className="text-sm font-black uppercase tracking-[0.22em] text-brand">
               Acciones
             </p>
             <h2 className="mt-1 text-2xl font-black tracking-tight text-white">

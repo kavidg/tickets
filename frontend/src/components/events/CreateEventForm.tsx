@@ -269,13 +269,13 @@ export default function CreateEventForm() {
       'focus:ring-2 disabled:opacity-50',
       hasError
         ? 'border-red-500/50 bg-red-500/10 focus:border-red-400 focus:ring-red-500/20'
-        : 'border-white/10 bg-luxe-black/60 focus:border-luxe-ember/50 focus:ring-luxe-ember/15',
+        : 'border-white/10 bg-neutral-800/60 focus:border-brand/50 focus:ring-brand/15',
       extra,
     ].join(' ');
   }
 
   function labelCls(): string {
-    return 'mb-2 block text-sm font-bold text-red-100/70';
+    return 'mb-2 block text-sm font-bold text-neutral-300';
   }
 
   function fieldError(field: string): ReactJSX.Element | null {
@@ -291,18 +291,18 @@ export default function CreateEventForm() {
     <>
       <form
         onSubmit={handleSubmit}
-        className="rounded-[2rem] border border-white/10 bg-white/[0.055] p-8 shadow-deep-luxe backdrop-blur-2xl"
+        className="rounded-[2rem] border border-white/10 bg-white/[0.055] p-8 shadow-card backdrop-blur-2xl"
         noValidate
       >
         {/* Encabezado */}
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-3 grid h-14 w-14 place-items-center rounded-2xl border border-luxe-ember/30 bg-gradient-to-br from-luxe-wine to-luxe-black shadow-lg shadow-luxe-ember/15">
+          <div className="mx-auto mb-3 grid h-14 w-14 place-items-center rounded-2xl border border-brand/30 bg-gradient-to-br from-brand/20 to-neutral-900 shadow-lg shadow-button">
             <span className="text-xl font-black text-white">+</span>
           </div>
           <h2 className="text-2xl font-black tracking-tight text-white">
             Crear evento
           </h2>
-          <p className="mt-2 text-sm text-red-100/60">
+          <p className="mt-2 text-sm text-neutral-400">
             Completa los datos para publicar un nuevo evento
           </p>
         </div>
@@ -326,7 +326,7 @@ export default function CreateEventForm() {
           </h3>            {/* Título */}
           <div className="mb-5">
             <label htmlFor="ev-title" className={labelCls()}>
-              Título <span className="text-luxe-ember">*</span>
+              Título <span className="text-brand-light">*</span>
             </label>
             <input
               id="ev-title"
@@ -346,7 +346,7 @@ export default function CreateEventForm() {
           {/* Descripción */}
           <div className="mb-5">
             <label htmlFor="ev-description" className={labelCls()}>
-              Descripción <span className="text-luxe-ember">*</span>
+              Descripción <span className="text-brand-light">*</span>
             </label>
             <textarea
               id="ev-description"
@@ -366,16 +366,16 @@ export default function CreateEventForm() {
           {/* Categoría */}
           <div className="mb-5">
             <label htmlFor="ev-category" className={labelCls()}>
-              Categoría <span className="text-luxe-ember">*</span>
+              Categoría <span className="text-brand-light">*</span>
             </label>
             {loadingCategories ? (
-              <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-luxe-black/60 px-4 py-3">
+              <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-neutral-800/60 px-4 py-3">
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                <span className="text-sm text-red-100/50">Cargando categorías…</span>
+                <span className="text-sm text-neutral-400">Cargando categorías…</span>
               </div>
             ) : categories.length === 0 ? (
-              <div className="rounded-2xl border border-white/10 bg-luxe-black/60 px-4 py-3">
-                <p className="text-sm text-red-100/50">
+              <div className="rounded-2xl border border-white/10 bg-neutral-800/60 px-4 py-3">
+                <p className="text-sm text-neutral-400">
                   No hay categorías disponibles. Crea una categoría primero.
                 </p>
               </div>
@@ -413,17 +413,17 @@ export default function CreateEventForm() {
         {/* ================================================================= */}
         <div className="mb-8">
           <h3 className="mb-4 text-lg font-black tracking-tight text-white">
-            Lugar <span className="text-luxe-ember">*</span>
+            Lugar <span className="text-brand-light">*</span>
           </h3>
 
           {loadingMyVenues ? (
-            <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-luxe-black/60 px-4 py-3">
+            <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-neutral-800/60 px-4 py-3">
               <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-              <span className="text-sm text-red-100/50">Cargando lugares…</span>
+              <span className="text-sm text-neutral-400">Cargando lugares…</span>
             </div>
           ) : venues.length === 0 ? (
-            <div className="mb-3 rounded-2xl border border-white/10 bg-luxe-black/60 px-4 py-3">
-              <p className="mb-3 text-sm text-red-100/50">
+            <div className="mb-3 rounded-2xl border border-white/10 bg-neutral-800/60 px-4 py-3">
+              <p className="mb-3 text-sm text-neutral-400">
                 No hay lugares disponibles. Crea uno nuevo.
               </p>
             </div>
@@ -459,7 +459,7 @@ export default function CreateEventForm() {
               setVenueError(null);
             }}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 text-sm font-bold text-luxe-ember transition hover:text-luxe-crimson disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 text-sm font-bold text-brand-light transition hover:text-brand disabled:opacity-50"
           >
             <span className="text-base leading-none">+</span>
             Nuevo lugar
@@ -480,7 +480,7 @@ export default function CreateEventForm() {
             {/* Inicio */}
             <div>
               <label htmlFor="ev-start-date" className={labelCls()}>
-                Fecha inicio <span className="text-luxe-ember">*</span>
+                Fecha inicio <span className="text-brand-light">*</span>
               </label>
               <input
                 id="ev-start-date"
@@ -498,7 +498,7 @@ export default function CreateEventForm() {
 
             <div>
               <label htmlFor="ev-start-time" className={labelCls()}>
-                Hora inicio <span className="text-luxe-ember">*</span>
+                Hora inicio <span className="text-brand-light">*</span>
               </label>
               <input
                 id="ev-start-time"
@@ -517,7 +517,7 @@ export default function CreateEventForm() {
             {/* Fin */}
             <div>
               <label htmlFor="ev-end-date" className={labelCls()}>
-                Fecha fin <span className="text-luxe-ember">*</span>
+                Fecha fin <span className="text-brand-light">*</span>
               </label>
               <input
                 id="ev-end-date"
@@ -535,7 +535,7 @@ export default function CreateEventForm() {
 
             <div>
               <label htmlFor="ev-end-time" className={labelCls()}>
-                Hora fin <span className="text-luxe-ember">*</span>
+                Hora fin <span className="text-brand-light">*</span>
               </label>
               <input
                 id="ev-end-time"
@@ -580,7 +580,7 @@ export default function CreateEventForm() {
             {fieldError('imageUrl')}
 
             {imageUrl && (
-              <div className="relative h-48 w-full overflow-hidden rounded-2xl border border-white/10 bg-luxe-black/80">
+              <div className="relative h-48 w-full overflow-hidden rounded-2xl border border-white/10 bg-neutral-800/80">
                 {imagePreviewError ? (
                   <div className="flex h-full items-center justify-center">
                     <p className="text-sm font-semibold text-red-400">
@@ -622,7 +622,7 @@ export default function CreateEventForm() {
             Estado
           </h3>
 
-          <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-white/10 bg-luxe-black/60 px-4 py-3 transition hover:border-white/20">
+          <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-white/10 bg-neutral-800/60 px-4 py-3 transition hover:border-white/20">
             <div className="relative">
               <input
                 type="checkbox"
@@ -631,14 +631,14 @@ export default function CreateEventForm() {
                 disabled={loading}
                 className="peer sr-only"
               />
-              <div className="h-6 w-11 rounded-full border border-white/15 bg-luxe-black transition peer-checked:border-luxe-ember/50 peer-checked:bg-luxe-ember/30" />
-              <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white/20 transition peer-checked:translate-x-5 peer-checked:bg-luxe-ember" />
+              <div className="h-6 w-11 rounded-full border border-white/15 bg-neutral-900 transition peer-checked:border-brand/50 peer-checked:bg-brand/30" />
+              <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white/20 transition peer-checked:translate-x-5 peer-checked:bg-brand" />
             </div>
             <div>
               <p className="text-sm font-bold text-white">
                 {published ? 'Publicado' : 'Borrador'}
               </p>
-              <p className="text-xs text-red-100/50">
+              <p className="text-xs text-neutral-400">
                 {published
                   ? 'El evento será visible para todos los usuarios.'
                   : 'Solo tú podrás ver el evento hasta que lo publiques.'}
@@ -672,7 +672,7 @@ export default function CreateEventForm() {
       {/* ================================================================= */}
       {showVenueModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-[2rem] border border-white/10 bg-luxe-black/95 p-6 shadow-deep-luxe backdrop-blur-2xl">
+          <div className="w-full max-w-md rounded-[2rem] border border-white/10 bg-neutral-800/95 p-6 shadow-card backdrop-blur-2xl">
             <div className="mb-6 flex items-center justify-between">
               <h3 className="text-lg font-black tracking-tight text-white">
                 Nuevo lugar
@@ -683,7 +683,7 @@ export default function CreateEventForm() {
                   setShowVenueModal(false);
                   setVenueError(null);
                 }}
-                className="grid h-8 w-8 place-items-center rounded-xl border border-white/10 text-sm text-red-100/50 transition hover:border-white/20 hover:text-white"
+                className="grid h-8 w-8 place-items-center rounded-xl border border-white/10 text-sm text-neutral-400 transition hover:border-white/20 hover:text-white"
                 aria-label="Cerrar"
               >
                 ✕
@@ -705,9 +705,9 @@ export default function CreateEventForm() {
               <div>
                 <label
                   htmlFor="modal-venue-name"
-                  className="mb-1.5 block text-xs font-bold text-red-100/70"
+                  className="mb-1.5 block text-xs font-bold text-neutral-300"
                 >
-                  Nombre <span className="text-luxe-ember">*</span>
+                  Nombre <span className="text-brand-light">*</span>
                 </label>
                 <input
                   id="modal-venue-name"
@@ -716,7 +716,7 @@ export default function CreateEventForm() {
                   value={modalVenueName}
                   onChange={(e) => setModalVenueName(e.target.value)}
                   disabled={creatingVenue}
-                  className="w-full rounded-2xl border border-white/10 bg-luxe-black/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+                  className="w-full rounded-2xl border border-white/10 bg-neutral-800/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
                 />
               </div>
 
@@ -724,9 +724,9 @@ export default function CreateEventForm() {
               <div>
                 <label
                   htmlFor="modal-venue-city"
-                  className="mb-1.5 block text-xs font-bold text-red-100/70"
+                  className="mb-1.5 block text-xs font-bold text-neutral-300"
                 >
-                  Ciudad <span className="text-luxe-ember">*</span>
+                  Ciudad <span className="text-brand-light">*</span>
                 </label>
                 <input
                   id="modal-venue-city"
@@ -735,7 +735,7 @@ export default function CreateEventForm() {
                   value={venueCity}
                   onChange={(e) => setVenueCity(e.target.value)}
                   disabled={creatingVenue}
-                  className="w-full rounded-2xl border border-white/10 bg-luxe-black/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+                  className="w-full rounded-2xl border border-white/10 bg-neutral-800/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
                 />
               </div>
 
@@ -743,7 +743,7 @@ export default function CreateEventForm() {
               <div>
                 <label
                   htmlFor="modal-venue-address"
-                  className="mb-1.5 block text-xs font-bold text-red-100/70"
+                  className="mb-1.5 block text-xs font-bold text-neutral-300"
                 >
                   Dirección
                 </label>
@@ -754,7 +754,7 @@ export default function CreateEventForm() {
                   value={venueAddress}
                   onChange={(e) => setVenueAddress(e.target.value)}
                   disabled={creatingVenue}
-                  className="w-full rounded-2xl border border-white/10 bg-luxe-black/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+                  className="w-full rounded-2xl border border-white/10 bg-neutral-800/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
                 />
               </div>
 
@@ -762,7 +762,7 @@ export default function CreateEventForm() {
               <div>
                 <label
                   htmlFor="modal-venue-capacity"
-                  className="mb-1.5 block text-xs font-bold text-red-100/70"
+                  className="mb-1.5 block text-xs font-bold text-neutral-300"
                 >
                   Capacidad
                 </label>
@@ -774,7 +774,7 @@ export default function CreateEventForm() {
                   value={venueCapacity}
                   onChange={(e) => setVenueCapacity(e.target.value)}
                   disabled={creatingVenue}
-                  className="w-full rounded-2xl border border-white/10 bg-luxe-black/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+                  className="w-full rounded-2xl border border-white/10 bg-neutral-800/60 px-4 py-2.5 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
                 />
               </div>
 
@@ -787,7 +787,7 @@ export default function CreateEventForm() {
                     setVenueError(null);
                   }}
                   disabled={creatingVenue}
-                  className="flex-1 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2.5 text-sm font-bold text-red-50 transition hover:border-white/20 disabled:opacity-50"
+                  className="flex-1 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2.5 text-sm font-bold text-neutral-50 transition hover:border-white/20 disabled:opacity-50"
                 >
                   Cancelar
                 </button>
@@ -795,7 +795,7 @@ export default function CreateEventForm() {
                   type="button"
                   onClick={handleCreateVenue}
                   disabled={creatingVenue}
-                  className="flex-1 rounded-2xl border border-luxe-ember/45 bg-gradient-to-r from-luxe-crimson to-luxe-ember px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-luxe-ember/20 transition hover:from-luxe-wine hover:to-luxe-crimmon disabled:opacity-50"
+                  className="flex-1 rounded-2xl border border-brand/45 bg-gradient-to-r bg-brand px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-button transition hover:bg-brand-light disabled:opacity-50"
                 >
                   {creatingVenue ? (
                     <span className="inline-flex items-center gap-2">

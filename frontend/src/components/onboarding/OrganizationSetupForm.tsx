@@ -131,12 +131,12 @@ export default function OrganizationSetupForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-[2rem] border border-white/10 bg-white/[0.055] p-8 shadow-deep-luxe backdrop-blur-2xl"
+      className="rounded-[2rem] border border-white/10 bg-white/[0.055] p-8 shadow-card backdrop-blur-2xl"
       noValidate
     >
       {/* Encabezado */}
       <div className="mb-8 text-center">
-        <div className="mx-auto mb-3 grid h-14 w-14 place-items-center rounded-2xl border border-luxe-ember/30 bg-gradient-to-br from-luxe-wine to-luxe-black shadow-lg shadow-luxe-ember/15">
+        <div className="mx-auto mb-3 grid h-14 w-14 place-items-center rounded-2xl border border-brand/30 bg-gradient-to-br from-brand-muted to-neutral-900 shadow-lg shadow-brand/15">
           <span className="text-xl font-black text-white">O</span>
         </div>
         <h2 className="text-2xl font-black tracking-tight text-white">
@@ -163,7 +163,7 @@ export default function OrganizationSetupForm() {
           htmlFor="org-name"
           className="mb-2 block text-sm font-bold text-red-100/70"
         >
-          Nombre de la organización <span className="text-luxe-ember">*</span>
+          Nombre de la organización <span className="text-brand">*</span>
         </label>
         <input
           id="org-name"
@@ -173,7 +173,7 @@ export default function OrganizationSetupForm() {
           value={name}
           onChange={(e) => handleNameChange(e.target.value)}
           disabled={loading}
-          className="w-full rounded-2xl border border-white/10 bg-luxe-black/60 px-4 py-3 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+          className="w-full rounded-2xl border border-white/10 bg-neutral-900/60 px-4 py-3 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
         />
       </div>
 
@@ -183,7 +183,7 @@ export default function OrganizationSetupForm() {
           htmlFor="org-slug"
           className="mb-2 block text-sm font-bold text-red-100/70"
         >
-          Slug <span className="text-luxe-ember">*</span>
+          Slug <span className="text-brand">*</span>
         </label>
         <div className="flex items-center gap-2">
           <span className="text-sm text-red-100/40">/</span>
@@ -195,7 +195,7 @@ export default function OrganizationSetupForm() {
             value={slug}
             onChange={(e) => handleSlugChange(e.target.value)}
             disabled={loading}
-            className="w-full rounded-2xl border border-white/10 bg-luxe-black/60 px-4 py-3 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+            className="w-full rounded-2xl border border-white/10 bg-neutral-900/60 px-4 py-3 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
           />
         </div>
         <p className="mt-1 text-xs text-red-100/40">
@@ -219,7 +219,7 @@ export default function OrganizationSetupForm() {
           onChange={(e) => setDescription(e.target.value)}
           disabled={loading}
           maxLength={500}
-          className="w-full resize-none rounded-2xl border border-white/10 bg-luxe-black/60 px-4 py-3 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+          className="w-full resize-none rounded-2xl border border-white/10 bg-neutral-900/60 px-4 py-3 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
         />
         <p className="mt-1 text-right text-xs text-red-100/40">
           {description.length}/500
@@ -242,7 +242,7 @@ export default function OrganizationSetupForm() {
           value={imageUrl}
           onChange={(e) => setImageUrl(e.target.value)}
           disabled={loading}
-          className="w-full rounded-2xl border border-white/10 bg-luxe-black/60 px-4 py-3 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-luxe-ember/50 focus:ring-2 focus:ring-luxe-ember/15 disabled:opacity-50"
+          className="w-full rounded-2xl border border-white/10 bg-neutral-900/60 px-4 py-3 text-sm text-white placeholder-red-100/30 outline-none transition focus:border-brand/50 focus:ring-2 focus:ring-brand/15 disabled:opacity-50"
         />
       </div>
 

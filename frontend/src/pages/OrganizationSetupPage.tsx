@@ -24,8 +24,8 @@ export default function OrganizationSetupPage() {
   return (
     <main className="relative flex min-h-[80vh] items-center justify-center overflow-hidden px-4 py-12">
       {/* Fondos decorativos */}
-      <div className="pointer-events-none absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full bg-luxe-wine/20 blur-3xl" />
-      <div className="pointer-events-none absolute bottom-0 right-0 h-64 w-64 rounded-full bg-luxe-ember/10 blur-3xl" />
+      <div className="pointer-events-none absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full bg-brand-muted/20 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-0 right-0 h-64 w-64 rounded-full bg-brand/10 blur-3xl" />
 
       <div className="relative w-full max-w-lg">
         <OrganizationSetupForm />

@@ -103,7 +103,7 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
       <p className="mt-2 text-red-100/55">{message}</p>
       <button
         onClick={onRetry}
-        className="mt-6 inline-flex items-center gap-2 rounded-2xl border border-luxe-ember/30 bg-luxe-wine px-5 py-3 text-sm font-bold text-white shadow-xl shadow-black/35 transition hover:bg-luxe-crimson hover:shadow-red-glow"
+        className="mt-6 inline-flex items-center gap-2 rounded-2xl border border-brand/30 bg-brand-muted px-5 py-3 text-sm font-bold text-white shadow-xl shadow-black/35 transition hover:bg-brand hover:shadow-glow"
       >
         Reintentar
       </button>
@@ -144,13 +144,13 @@ export default function OrganizerEventsPage() {
   return (
     <main className="relative mx-auto max-w-6xl px-4 py-12">
       {/* Fondos decorativos */}
-      <div className="pointer-events-none absolute left-0 top-0 h-80 w-80 rounded-full bg-luxe-wine/15 blur-3xl" />
-      <div className="pointer-events-none absolute right-0 top-40 h-64 w-64 rounded-full bg-luxe-ember/10 blur-3xl" />
+      <div className="pointer-events-none absolute left-0 top-0 h-80 w-80 rounded-full bg-brand-muted/15 blur-3xl" />
+      <div className="pointer-events-none absolute right-0 top-40 h-64 w-64 rounded-full bg-brand/10 blur-3xl" />
 
       <div className="relative">
         {/* Encabezado */}
         <div className="mb-8">
-          <p className="text-sm font-black uppercase tracking-[0.22em] text-luxe-ember">
+          <p className="text-sm font-black uppercase tracking-[0.22em] text-brand">
             Organizador
           </p>
           <h1 className="mt-2 text-3xl font-black tracking-tight text-white">Mis eventos</h1>
@@ -187,10 +187,10 @@ export default function OrganizerEventsPage() {
               return (
                 <div
                   key={event.id}
-                  className="group overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/[0.055] shadow-2xl shadow-black/35 backdrop-blur-xl transition hover:border-luxe-ember/30"
+                  className="group overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/[0.055] shadow-2xl shadow-black/35 backdrop-blur-xl transition hover:border-brand/30"
                 >
                   {/* Imagen */}
-                  <div className="relative h-44 w-full overflow-hidden bg-luxe-black/80">
+                  <div className="relative h-44 w-full overflow-hidden bg-neutral-900/80">
                     {event.imageUrl ? (
                       <img
                         src={event.imageUrl}
@@ -236,13 +236,13 @@ export default function OrganizerEventsPage() {
                     <div className="mt-5 flex items-center gap-3">
                       <a
                         href={`/event/${event.slug}`}
-                        className="inline-flex flex-1 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2.5 text-sm font-bold text-red-100/70 shadow-lg shadow-black/25 backdrop-blur-xl transition hover:border-luxe-ember/40 hover:text-luxe-ember"
+                        className="inline-flex flex-1 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2.5 text-sm font-bold text-red-100/70 shadow-lg shadow-black/25 backdrop-blur-xl transition hover:border-brand/40 hover:text-brand"
                       >
                         Ver
                       </a>
                       <a
                         href={`/organizer/events/manage/${event.id}`}
-                        className="inline-flex flex-1 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2.5 text-sm font-bold text-red-100/70 shadow-lg shadow-black/25 backdrop-blur-xl transition hover:border-luxe-ember/40 hover:text-luxe-ember"
+                        className="inline-flex flex-1 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2.5 text-sm font-bold text-red-100/70 shadow-lg shadow-black/25 backdrop-blur-xl transition hover:border-brand/40 hover:text-brand"
                       >
                         Gestionar
                       </a>
