@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
   theme: {
     extend: {
@@ -38,6 +39,8 @@ export default {
         'glow-lg': '0 0 60px rgba(193, 18, 31, 0.12)',
         'modal': '0 25px 60px rgba(0, 0, 0, 0.5)',
         'button': '0 4px 14px rgba(193, 18, 31, 0.25)',
+        'card-light': '0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06)',
+        'card-hover-light': '0 10px 30px -5px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.06)',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out forwards',

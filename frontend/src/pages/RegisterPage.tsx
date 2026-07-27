@@ -88,7 +88,7 @@ export default function RegisterPage() {
   // -----------------------------------------------------------------------
 
   return (
-    <main className="relative flex min-h-[80vh] items-center justify-center overflow-hidden px-4 py-12">
+    <main className="relative flex min-h-[80vh] items-center justify-center overflow-hidden px-4 pt-28 pb-12">
       {/* Fondos decorativos */}
       <div className="pointer-events-none absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full bg-brand-muted/20 blur-3xl" />
       <div className="pointer-events-none absolute bottom-0 right-0 h-64 w-64 rounded-full bg-brand/10 blur-3xl" />
@@ -97,13 +97,13 @@ export default function RegisterPage() {
         {/* Header del formulario */}
         <div className="mb-8 text-center">
           <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-3xl border border-brand/30 bg-gradient-to-br from-brand-muted to-neutral-900 shadow-lg shadow-brand/20">
-            <span className="text-2xl font-black text-white">T</span>
+            <span className="text-2xl font-black text-white">P</span>
           </div>
           <h1 className="text-3xl font-black tracking-tight text-white">
             Crear cuenta
           </h1>
           <p className="mt-2 text-red-100/60">
-            Regístrate para comprar entradas y administrar tus eventos
+            Regístrate para obtener una experiencia más personalizada y beneficios exclusivos
           </p>
         </div>
 

@@ -20,6 +20,7 @@ import Footer from '../components/layout/Footer.jsx';
 
 // Páginas públicas
 import HomePage from '../pages/HomePage.jsx';
+import EventsPage from '../pages/EventsPage.jsx';
 import EventDetailPage from '../pages/EventDetailPage.jsx';
 import CheckoutPage from '../pages/CheckoutPage';
 import TicketLookupPage from '../pages/TicketLookupPage.jsx';
@@ -66,6 +67,7 @@ function resolveRoute(eventId, pathname) {
 
   if (pathname === '/checkout') return <CheckoutPage />;
   if (pathname === '/purchase/success') return <PurchaseSuccessPage />;
+  if (pathname === '/events') return <EventsPage />;
   if (pathname === '/tickets/search') return <TicketLookupPage />;
 
   if (pathname === '/login') return <LoginPage />;

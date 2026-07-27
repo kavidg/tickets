@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { LogOut, Menu, Ticket, User, X } from 'lucide-react';
+import { LogOut, Menu, Moon, Sun, Ticket, User, X } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
+import { useTheme } from '../../contexts/ThemeContext';
 
 /**
  * Modern sticky header with transparent-to-blur transition on scroll.
@@ -10,6 +11,7 @@ export default function Header() {
   const { user, loading, authenticated, logout } = useAuth();
   const [loggingOut, setLoggingOut] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { theme, toggleTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   // Track scroll position for blur effect
@@ -71,6 +73,33 @@ export default function Header() {
 
         {/* Desktop Auth */}
         <div className="hidden items-center gap-3 md:flex">
+          {/* Theme toggle - iOS-style switch */}
+          <button
+            type="button"
+            role="switch"
+            aria-checked={theme === 'light'}
+            onClick={toggleTheme}
+            aria-label={theme === 'dark' ? 'Activar modo claro' : 'Activar modo oscuro'}
+            className={`relative inline-flex h-7 w-[52px] shrink-0 cursor-pointer items-center rounded-full border border-white/[0.1] transition-colors duration-300 ${
+              theme === 'dark'
+                ? 'bg-neutral-700'
+                : 'bg-brand'
+            }`}
+          >
+            {/* Thumb deslizante con icono dentro */}
+            <span
+              className={`inline-flex items-center justify-center h-[22px] w-[22px] rounded-full bg-white shadow-sm transition-transform duration-300 ${
+                theme === 'light' ? 'translate-x-[26px]' : 'translate-x-[2px]'
+              }`}
+            >
+              {theme === 'dark' ? (
+                <Moon className="h-3 w-3 text-neutral-600" />
+              ) : (
+                <Sun className="h-3 w-3 text-amber-500" />
+              )}
+            </span>
+          </button>
+
           {loading ? null : authenticated && user ? (
             <>
               <a
@@ -131,6 +160,38 @@ export default function Header() {
               </a>
             ))}
             <hr className="border-white/[0.06] my-3" />
+
+            {/* Theme toggle - mobile */}
+            <button
+              type="button"
+              role="switch"
+              aria-checked={theme === 'light'}
+              onClick={toggleTheme}
+              className="flex w-full items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm font-medium text-neutral-300 transition hover:bg-white/[0.05] hover:text-white"
+            >
+              <span>Apariencia</span>
+              <span
+                className={`relative inline-flex h-7 w-[52px] shrink-0 cursor-pointer items-center rounded-full border border-white/[0.1] transition-colors duration-300 ${
+                  theme === 'dark'
+                    ? 'bg-neutral-700'
+                    : 'bg-brand'
+                }`}
+              >
+                {/* Thumb deslizante con icono dentro */}
+                <span
+                  className={`inline-flex items-center justify-center h-[22px] w-[22px] rounded-full bg-white shadow-sm transition-transform duration-300 ${
+                    theme === 'light' ? 'translate-x-[26px]' : 'translate-x-[2px]'
+                  }`}
+                >
+                  {theme === 'dark' ? (
+                    <Moon className="h-3 w-3 text-neutral-600" />
+                  ) : (
+                    <Sun className="h-3 w-3 text-amber-500" />
+                  )}
+                </span>
+              </span>
+            </button>
+
             {authenticated && user ? (
               <>
                 <a
